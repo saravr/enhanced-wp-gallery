@@ -40,7 +40,7 @@ jQuery(function($) {
             this.window = wp.media({
                 title: 'Select images for gallery',
                 library: {type: 'image'},
-                multiple: true,
+                multiple: 'add',
                 button: {text: 'Create Gallery'}
             });
 
@@ -137,7 +137,7 @@ jQuery(function($) {
         object.window = wp.media({
                         title: 'Select images for gallery',
                         library: {type: 'image'},
-                        multiple: true,
+                        multiple: 'add',
                         button: {text: 'Create Gallery'}
         });
 
