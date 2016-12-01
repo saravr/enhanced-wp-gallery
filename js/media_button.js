@@ -3,10 +3,10 @@ jQuery(function($) {
     var shortcode = 'egallery'; // TBD replace shortcodes below
 
     $(document).ready(function(e){
-        $('#insert-my-media').click(open_media_window);
+        $('#insert-my-media').click({mode: 'new'}, open_media_window);
 
         jQuery(document).off('click', '.dashicons-edit');
-        jQuery(document).on('click', '.dashicons-edit', open_media_window);
+        jQuery(document).on('click', '.dashicons-edit', {mode: 'edit'}, open_media_window);
     });
 
     function sendSelection (mdata) {
@@ -22,18 +22,23 @@ jQuery(function($) {
         });
     }
 
-    var open_media_window = function () {
+    var open_media_window = function (e) {
 
         console.log('OPEN MEDIA WINDOW ...');
 
-        var x = jQuery('#wpwrap textarea'); // TBD -- handle > 1 gallery
-        var content = x.html();
-        var regex = /\[egallery ids=([^\]]*)\]/;
-        var matches = regex.exec(content);
         var idlist = [];
-        if (matches !== null && matches.length > 1) {
-            var data = matches[1].replace(/['"]+/g, '');
-            idlist = data.split(",");
+
+        this.galleryMode = e.data.mode;
+        if (this.galleryMode === "edit") {
+            var textArea = jQuery('#wpwrap textarea'); // TBD -- handle > 1 gallery
+            var content = textArea.html();
+            this.galleryContents = content;
+            var regex = /\[egallery ids=([^\]]*)\]/;
+            var matches = regex.exec(content);
+            if (matches !== null && matches.length > 1) {
+                var data = matches[1].replace(/['"]+/g, '');
+                idlist = data.split(",");
+            }
         }
 
         //if (this.window === undefined) {
@@ -121,7 +126,15 @@ jQuery(function($) {
 
             mdata.push({"att": id, "title": title, "caption": caption});
         }
-        wp.media.editor.insert('[egallery ids="' + idlist + '"]');
+
+        var gallerySC = '[egallery ids="' + idlist + '"]';
+        if (object.galleryMode === "new") {
+            wp.media.editor.insert(gallerySC);
+        } else {
+            var contents = tinyMCE.activeEditor.getContent();
+            contents = contents.replace(object.galleryContents, gallerySC);
+            tinyMCE.activeEditor.setContent(contents);
+        }
 
         sendSelection(mdata);
 
