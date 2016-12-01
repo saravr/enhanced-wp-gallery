@@ -22,8 +22,6 @@ class EnhancedWPGallery {
 
     private function __construct() {
         
-        register_activation_hook(__FILE__, array($this, 'jal_install'));
-
         add_action('wp_enqueue_media', array($this, 'include_media_button_js_file'));
         add_action('media_buttons', array($this, 'add_my_media_button'));
         add_action('wp_ajax_coll_info', array($this, 'coll_info_callback'));
@@ -72,100 +70,82 @@ class EnhancedWPGallery {
         $mdata = $_POST['mdata'];
         error_log($postid . ': Gallery collection: ' . print_r($mdata, 1));
 
+        $atts = Array();
+        foreach ($mdata as $att) {
+            $attid = $att['att'];
+            $title = $att['title'];
+            $caption = $att['caption'];
+
+            $att_post = get_post($attid); 
+            $excerpt = $att_post->post_excerpt;
+            if (strcmp($caption, $excerpt) !== 0) {
+                $newid = $this->clone_attachment($attid, $title, $caption);
+                array_push($atts, $newid);
+            } else {
+                array_push($atts, $attid);
+            }
+        }
+
+        $newids = implode(', ', $atts);
+        echo "{\"status\": \"ok\", \"idlist\": \"" . $newids . "\"}";
+
         wp_die();
     }
 
-    private function indcap_get_table_name () {
+    private function clone_attachment ($parent_id, $title, $caption) {
         global $wpdb;
 
-        return $wpdb->prefix . "indcaps";
-    }
-
-    function jal_install () {
-        global $wpdb;
-
-        $table_name = $this->indcap_get_table_name();
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {
-            error_log('DBG: Table exists already: ' . $table_name);
-            return;
-        }
-
-        $charset_collate = $wpdb->get_charset_collate();
-
-        $sql = "CREATE TABLE $table_name (
-          timestamp TIMESTAMP NOT NULL,
-          id bigint(20) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-          postid bigint(20) unsigned NOT NULL,
-          attid bigint(20) unsigned NOT NULL,
-          title varchar(512),
-          caption varchar(1024)
-        ) $charset_collate;";
-
-        error_log('DBG: Creating table with SQL: ' . $sql);
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-
-        add_option('jal_db_version', '1.0');
-    }
-
-    private function gr_save_media_info ($postid, $attid, $title, $caption) {
-        global $wpdb;
-
-        yp_log($postid, 'Saving media info for attid: ' . $attid);
-
-        $table_name = $this->indcap_get_table_name();
-        $cond = 'postid = "' . $postid . '" AND attid = ' . $attid;
-        $sql = 'SELECT attid FROM ' . $table_name . ' WHERE ' . $cond;
-        $res = $wpdb->get_results($sql, OBJECT);
-        if (count($res) > 0) {
-            $res = $wpdb->update(
-                $table_name,
+        $clone_id = '';
+        $table_name = $wpdb->prefix . "posts";
+        $sql = 'SELECT * FROM ' . $table_name . ' WHERE id = ' . $parent_id;
+        $results = $wpdb->get_results($sql, OBJECT);
+        foreach ($results as $result) {
+            $res = $wpdb->insert(
+                $wpdb->posts,
                 array(
-                    'timestamp' => current_time('mysql'),
-                    'title' => $title,
-                    'caption' => $caption
+                    'post_author' => $result->post_author,
+                    'post_date' => $result->post_date,
+                    'post_date_gmt' => $result->post_date_gmt,
+                    'post_title' => $title,
+                    'post_excerpt' => $caption,
+                    'post_status' => $result->post_status,
+                    'comment_status' => $result->comment_status,
+                    'ping_status' => $result->ping_status,
+                    'post_name' => $result->post_name,
+                    'post_modified' => current_time('mysql'),
+                    'post_modified_gmt' => current_time('mysql'),
+                    'post_parent' => $parent_id,
+                    'guid' => $result->guid,
+                    'post_type' => $result->post_type,
+                    'post_mime_type' => $result->post_mime_type
                 ),
                 array(
-                    'postid' => $postid,
-                    'attid' => $attid
+                    '%s', '%s', '%s', '%s', '%s', '%s',
+                    '%s', '%s', '%s', '%s', '%s', '%d',
+                    '%s', '%s', '%s'
                 )
             );
-            if ($res > 0) {
-                error_log('DBG: Successfully updated record for attid' . $attid);
-            } else {
-                error_log('DBG: Failed update attid: ' . $attid . ', ' . $wpdb->last_query);
+
+            if ($res) {
+                $clone_id = $wpdb->insert_id;
+
+                $attrs = array("_wp_attached_file", "amazonS3_info", "_wp_attachment_metadata");
+                foreach ($attrs as $attr) {
+                    if (!$this->clone_meta($parent_id, $clone_id, $attr)) {
+                        error_log("Failed to clone key: " . $attr . " (" . $parent_id . ")");
+                    }
+                }
             }
-        } else { // insert ...
-            $res = $wpdb->insert(
-                $table_name,
-                array(
-                    'timestamp' => current_time('mysql'),
-                    'postid' => $postid,
-                    'attid' => $attid,
-                    'title' => $title,
-                    'caption' => $caption
-                )
-            );
-            if ($res > 0) {
-                error_log('DBG: Successfully inserted record for attid ' . $attid);
-            } else {
-                error_log('DBG: Failed to insert record for attid ' . $attid);
-            }
+            break; // TBD
         }
+
+        return $clone_id;
     }
 
-    // For future use
-    function media_info_callback () {
+    private function clone_meta ($parent_id, $clone_id, $key) {
 
-        $postid = $_POST['postid'];
-        $value = $_POST['value'];
-        yp_log($postid, ': Media Info: ' . print_r($value, 1));
-
-        foreach ($value as $att) {
-            $this->gr_save_media_info($postid, $att['attid'], $att['title'], $att['caption']);
-        }
-
-        wp_die();
+        $value = get_post_meta($parent_id, $key, true);
+        return add_post_meta($clone_id, $key, $value);
     }
 }
 

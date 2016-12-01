@@ -9,7 +9,7 @@ jQuery(function($) {
         jQuery(document).on('click', '.dashicons-edit', {mode: 'edit'}, open_media_window);
     });
 
-    function sendSelection (mdata) {
+    function sendSelection (mdata, object, callback) {
 
         var sel_msg = {
             'action': 'coll_info',
@@ -19,6 +19,10 @@ jQuery(function($) {
 
         jQuery.post(url, sel_msg, function(response) {
             console.log('Sent selection - response: ' + response);
+            var resp = JSON.parse(response);
+            console.log('STATUS: ' + resp.status);
+            console.log('IDLIST: ' + resp.idlist);
+            callback(resp.idlist, object);
         });
     }
 
@@ -127,16 +131,18 @@ jQuery(function($) {
             mdata.push({"att": id, "title": title, "caption": caption});
         }
 
-        var gallerySC = '[egallery ids="' + idlist + '"]';
-        if (object.galleryMode === "new") {
-            wp.media.editor.insert(gallerySC);
-        } else {
-            var contents = tinyMCE.activeEditor.getContent();
-            contents = contents.replace(object.galleryContents, gallerySC);
-            tinyMCE.activeEditor.setContent(contents);
-        }
+        sendSelection(mdata, object, function(idlist, object) {
 
-        sendSelection(mdata);
+            var gallerySC = '[egallery ids="' + idlist + '"]';
+            console.log('GALLERY SC: ' + gallerySC);
+            if (object.galleryMode === "new") {
+                wp.media.editor.insert(gallerySC);
+            } else {
+                var contents = tinyMCE.activeEditor.getContent();
+                contents = contents.replace(object.galleryContents, gallerySC);
+                tinyMCE.activeEditor.setContent(contents);
+            }
+        });
 
         object.window.close();
         return false;
