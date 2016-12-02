@@ -7,7 +7,27 @@ jQuery(function($) {
 
         jQuery(document).off('click', '.dashicons-edit');
         jQuery(document).on('click', '.dashicons-edit', {mode: 'edit'}, open_media_window);
+
+        jQuery(document).off('click', '.dashicons-no');
+        jQuery(document).on('click', '.dashicons-no', delete_gallery);
     });
+
+    var delete_gallery = function (e) {
+
+        var textArea = jQuery('#wpwrap textarea'); // TBD -- handle > 1 gallery
+        var text = textArea.html();
+
+        var regex = /\[egallery ids=([^\]]*)\]/;
+        var matches = regex.exec(text);
+        if (matches !== null && matches.length > 1) {
+            var gallery = matches[0];
+
+            var contents = tinyMCE.activeEditor.getContent();
+            contents = contents.replace(gallery, "");
+            console.log('Removing gallery: ' + gallery);
+            tinyMCE.activeEditor.setContent(contents);
+        }
+    }
 
     function sendSelection (mdata, object, callback) {
 
