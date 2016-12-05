@@ -137,7 +137,7 @@ jQuery(function($) {
             panel.append(ida);
         }
         panel.append("<hr style='clear:left;'/>");
-        panel.append("<div style='margin-top:10px;margin-bottom:10px;padding-bottom:40px;'><button class='button-primary button-large' style='margin-right:5px;float:right;' id='" + submitId + "'>Insert Gallery</button><button id='" + backid + "' class='button-primary button-large' style='margin-right:5px;float:right;'>Back</button></div>");
+        panel.append("<div style='margin-top:10px;margin-bottom:10px;padding-bottom:40px;'><button class='button-primary button-large' style='margin-right:5px;float:right;' id='" + submitId + "'>Insert Gallery</button><button id='" + backid + "' class='button-primary button-large' style='margin-right:5px;float:right;'>Edit Gallery</button></div>");
         console.log('User selected ids: ' + idlist);
 
         jQuery(".media-modal-content").replaceWith(panel);
