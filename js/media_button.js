@@ -116,35 +116,68 @@ jQuery(function($) {
                 idlist.push(id);
             }
         }
+
         for (i = 0; i < idlist.length; i++) {
-            var id = idlist[i];
+            var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
             var attObj = wp.media.attachment(id);
             attObj.fetch();
             var aaa = JSON.stringify(attObj);
             var att = JSON.parse(aaa);
 
-            var ida = "<div style='margin-left:40px;resize:vertical;overflow:auto;'>";
+            var ida = '<div id="att-' + id + '" style="margin-left:40px;resize:vertical;overflow:auto;">';
 
             titleId = titlePfx + '-' + id;
             captionId = captionPfx + '-' + id;
 
             var url = att.sizes.thumbnail.url;
-            ida += '<div style="height:160px;width:160px;margin-top:20px;margin-right:40px;float:right;"><img style="max-width:100%;max-height:100%;" src="' + url + '"/></div>';
+
+            var deleteId = 'ewg-delete-' + dt + '-' + id;
+            var deleteTag = '#' + deleteId;
+            var del = "<button style='float:right;' id='" + deleteId + "'>" + id + "</button>";
+
+            ida += '<div style="height:160px;width:160px;margin-top:20px;margin-right:40px;float:right;"><img style="max-width:100%;max-height:100%;" src="' + url + '"/>' + del + '</div>';
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=" + att.title + "/></div>";
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label></div><br/><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div>";
+            if (i < (idlist.length - 1)) {
+                ida += "<hr style='margin-top:10px;'/>";
+            }
             ida += "</div>";
-            ida += "<hr style='margin-top:10px;margin-left:40px;'/>";
             panel.append(ida);
         }
+
         panel.append("<hr style='clear:left;'/>");
         panel.append("<div style='margin-top:10px;margin-bottom:10px;padding-bottom:40px;'><button class='button-primary button-large' style='margin-right:5px;float:right;' id='" + submitId + "'>Insert Gallery</button><button id='" + backid + "' class='button-primary button-large' style='margin-right:5px;float:right;'>Edit Gallery</button></div>");
         console.log('User selected ids: ' + idlist);
 
         jQuery(".media-modal-content").replaceWith(panel);
+
+        for (i = 0; i < idlist.length; i++) {
+            var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
+
+            var deleteId = 'ewg-delete-' + dt + '-' + id;
+            var deleteTag = '#' + deleteId;
+            jQuery(deleteTag).off('click');
+            (function(idx) {
+                jQuery(deleteTag).click(function (e) {
+                    jQuery("#att-" + idx).hide('slow', function() {
+                        this.remove();
+                        var newlist = [];
+                        for (i = 0; i < idlist.length; i++) {
+                            var idc = (typeof idlist[i] === "string") ?
+                                idlist[i].trim() : idlist[i];
+                            if (idc === idx) {
+                                idlist.splice(i, 1);
+                            }
+                        }
+                        console.log('ID list after remove: ' + idlist);
+                    });
+                });
+            })(id);
+        }
+
         console.log('Setting back handler with idlist: ' + idlist);
         jQuery(backtag).off('click');
         jQuery(backtag).click(function(e) { backHandler(idlist, object); });
-        //jQuery("#newgl").on('click', backtag, function(e) { backHandler(idlist, object); });
 
         jQuery(submitTag).off('click');
         jQuery(submitTag).click(function(e) { submitHandler(dt, idlist, object); });
@@ -156,7 +189,8 @@ jQuery(function($) {
 
         var mdata = [];
         for (i = 0; i < idlist.length; i++) {
-            var id = idlist[i];
+            var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
+            console.log('SUBMIT ID: ' + id);
 
             var titleId = 'ewg-title-' + dt + '-' + id;
             var title = jQuery("#" + titleId).val();
