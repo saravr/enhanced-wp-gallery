@@ -133,9 +133,9 @@ jQuery(function($) {
 
             var deleteId = 'ewg-delete-' + dt + '-' + id;
             var deleteTag = '#' + deleteId;
-            var del = "<button style='float:right;' id='" + deleteId + "'>" + id + "</button>";
+            var del = "<button class='closeButton' style='background-repeat:no-repeat;height:10px;width:10px;float:right;' id='" + deleteId + "'></button>";
 
-            ida += '<div style="height:160px;width:160px;margin-top:20px;margin-right:40px;float:right;"><img style="max-width:100%;max-height:100%;" src="' + url + '"/>' + del + '</div>';
+            ida += '<div style="height:160px;width:160px;margin-top:10px;margin-right:40px;float:right;"><img style="max-width:100%;max-height:100%;" src="' + url + '"/>' + del + '</div>';
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label></div><br/><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div>";
             if (i < (idlist.length - 1)) {

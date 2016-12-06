@@ -58,6 +58,7 @@ class EnhancedWPGallery {
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'post_id' => $postid
             ));
+        wp_enqueue_style('eg_style', plugins_url('css/style.css', __FILE__));
     }
 
     function add_my_media_button () {

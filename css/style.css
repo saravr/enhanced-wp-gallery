@@ -1,0 +1,8 @@
+.closeButton {
+    background: url("../images/cross.png");
+    border: none;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+}
+
