@@ -121,7 +121,7 @@ jQuery(function($) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
             var attObj = wp.media.attachment(id);
             attObj.fetch();
-            var aaa = JSON.stringify(attObj);
+            var aaa = JSON.stringify(attObj); // TBD !!!
             var att = JSON.parse(aaa);
 
             var ida = '<div id="att-' + id + '" style="margin-left:40px;resize:vertical;overflow:auto;">';
@@ -136,7 +136,7 @@ jQuery(function($) {
             var del = "<button style='float:right;' id='" + deleteId + "'>" + id + "</button>";
 
             ida += '<div style="height:160px;width:160px;margin-top:20px;margin-right:40px;float:right;"><img style="max-width:100%;max-height:100%;" src="' + url + '"/>' + del + '</div>';
-            ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=" + att.title + "/></div>";
+            ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label></div><br/><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div>";
             if (i < (idlist.length - 1)) {
                 ida += "<hr style='margin-top:10px;'/>";
