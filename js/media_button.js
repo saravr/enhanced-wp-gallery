@@ -105,7 +105,7 @@ jQuery(function($) {
         var captionPfx = 'ewg-caption-' + dt;
 
         console.log('BACKTAG: ' + backtag);
-        var panel = jQuery('<div id="newgl" style="padding-top:40px;overflow-y:scroll;height:100%;background:white;"></div>');
+        var panel = jQuery('<div id="newgl" style="overflow-y:scroll;height:540px;"></div>');
         panel.append("<hr style='clear:left;'/>");
 
         if (idlist === undefined) {
@@ -146,10 +146,19 @@ jQuery(function($) {
         }
 
         panel.append("<hr style='clear:left;'/>");
-        panel.append("<div style='margin-top:10px;margin-bottom:10px;padding-bottom:40px;'><button class='button-primary button-large' style='margin-right:5px;float:right;' id='" + submitId + "'>Insert Gallery</button><button id='" + backid + "' class='button-primary button-large' style='margin-right:5px;float:right;'>Edit Gallery</button></div>");
+
         console.log('User selected ids: ' + idlist);
 
-        jQuery(".media-modal-content").replaceWith(panel);
+        var outerPanel = jQuery('<div style="overflow-y:hidden;height:660px;background:white;"></div>');
+        var filler = jQuery('<div style="height:40px;"></div>');
+
+        var footer = jQuery("<div style='margin-top:30px;padding-top:10px;padding-right:20px;bottom:0px;height:60px;'><button class='button-primary button-large' style='margin-left:10px;float:right;' id='" + submitId + "'>Insert Gallery</button><button id='" + backid + "' class='button-primary button-large' style='margin-left:10px;float:right;'>Edit Gallery</button></div>");
+
+        outerPanel.append(filler);
+        outerPanel.append(panel);
+        outerPanel.append(footer);
+
+        jQuery(".media-modal-content").replaceWith(outerPanel);
 
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
