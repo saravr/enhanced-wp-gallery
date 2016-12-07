@@ -25,13 +25,11 @@ jQuery(function($) {
 
     var delete_gallery = function (e) {
 
-        //var contents = tinyMCE.activeEditor.getContent();
         var contents = tinyMCE.get("content").getContent();
         var gallery = extractGallery(contents);
 
         contents = contents.replace(gallery, "");
         console.log('Removing gallery: ' + gallery);
-        //tinyMCE.activeEditor.setContent(contents);
         tinyMCE.get("content").setContent(contents);
     }
 
@@ -60,7 +58,6 @@ jQuery(function($) {
 
         this.galleryMode = e.data.mode;
         if (this.galleryMode === "edit") {
-            //var contents = tinyMCE.activeEditor.getContent();
             var contents = tinyMCE.get("content").getContent();
             console.log('EDIT: Original contents: ' + contents);
             var content = extractGallery(contents);
@@ -141,7 +138,7 @@ jQuery(function($) {
 
             ida += '<div style="height:160px;width:160px;margin-top:10px;margin-right:40px;float:right;"><img style="max-width:100%;max-height:100%;" src="' + url + '"/>' + del + '</div>';
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
-            ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label></div><br/><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div>";
+            ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label></div><br/><div style='border:1px solid #ddd;'><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
             if (i < (idlist.length - 1)) {
                 ida += "<hr style='margin-top:10px;'/>";
             }
@@ -229,13 +226,11 @@ jQuery(function($) {
             if (object.galleryMode === "new") {
                 wp.media.editor.insert(gallerySC);
             } else {
-                //var contents = tinyMCE.activeEditor.getContent();
                 var contents = tinyMCE.get("content").getContent();
                 console.log('Original contents: ' + contents);
                 var gallery = extractGallery(contents);
                 console.log('Replacing: ' + gallery + ' with ' + gallerySC);
                 contents = contents.replace(gallery, gallerySC);
-                //tinyMCE.activeEditor.setContent(contents);
                 tinyMCE.get("content").setContent(contents);
                 console.log('Loaded edited gallery: ' + contents);
             }

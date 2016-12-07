@@ -5,6 +5,7 @@
 
         function updateGalleryItem (url, caption, gid, id) {
 
+            console.log('Received media info for ID: ' + id);
             id = id.trim();
             var imgId = gid + '-img-' + id;
             var captionId = gid + '-caption-' + id;
@@ -43,12 +44,13 @@
 
             var output = '';
             for (i = 0; i < ids.length; i++) {
-                var id = ids[i];
+                var id = ids[i].trim();
                 var att = new wp.media.attachment(id);
                 var url = att.get('url');
                 output += getGalleryItem(url, att.get('caption'), gid, id);
 
                 if (url === undefined) {
+                    console.log('Media info not available yet for id: ' + id + ', req aysncly');
                     (function(attx, gidx, idx) {
                         var cb = function(att) {
                             return updateGalleryItem(
