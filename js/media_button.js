@@ -25,12 +25,14 @@ jQuery(function($) {
 
     var delete_gallery = function (e) {
 
-        var contents = tinyMCE.activeEditor.getContent();
+        //var contents = tinyMCE.activeEditor.getContent();
+        var contents = tinyMCE.get("content").getContent();
         var gallery = extractGallery(contents);
 
         contents = contents.replace(gallery, "");
         console.log('Removing gallery: ' + gallery);
-        tinyMCE.activeEditor.setContent(contents);
+        //tinyMCE.activeEditor.setContent(contents);
+        tinyMCE.get("content").setContent(contents);
     }
 
     function sendSelection (mdata, object, callback) {
@@ -58,7 +60,8 @@ jQuery(function($) {
 
         this.galleryMode = e.data.mode;
         if (this.galleryMode === "edit") {
-            var contents = tinyMCE.activeEditor.getContent();
+            //var contents = tinyMCE.activeEditor.getContent();
+            var contents = tinyMCE.get("content").getContent();
             console.log('EDIT: Original contents: ' + contents);
             var content = extractGallery(contents);
             this.galleryContents = content;
@@ -96,6 +99,7 @@ jQuery(function($) {
     var selectHandler = function (object, idlist) {
 
         console.log('Select handler invoked ... ');
+
         var dt = Date.now();
         var backid = 'ewg-back-' + dt;
         var backtag = '#' + backid;
@@ -163,6 +167,10 @@ jQuery(function($) {
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
 
+            var captionId = captionPfx + '-' + id;
+            tinyMCE.execCommand("mceAddEditor", false, captionId);
+            tinyMCE.execCommand('mceAddControl', false, captionId);
+
             var deleteId = 'ewg-delete-' + dt + '-' + id;
             var deleteTag = '#' + deleteId;
             jQuery(deleteTag).off('click');
@@ -206,7 +214,9 @@ jQuery(function($) {
             console.log(dt + ": title: " + title);
 
             var captionId = 'ewg-caption-' + dt + '-' + id;
-            var caption = jQuery("#" + captionId).val();
+            //var caption = jQuery("#" + captionId).val();
+            var caption = tinyMCE.get(captionId).getContent();
+
             console.log(dt + ": caption: " + caption);
 
             mdata.push({"att": id, "title": title, "caption": caption});
@@ -219,12 +229,14 @@ jQuery(function($) {
             if (object.galleryMode === "new") {
                 wp.media.editor.insert(gallerySC);
             } else {
-                var contents = tinyMCE.activeEditor.getContent();
+                //var contents = tinyMCE.activeEditor.getContent();
+                var contents = tinyMCE.get("content").getContent();
                 console.log('Original contents: ' + contents);
                 var gallery = extractGallery(contents);
                 console.log('Replacing: ' + gallery + ' with ' + gallerySC);
                 contents = contents.replace(gallery, gallerySC);
-                tinyMCE.activeEditor.setContent(contents);
+                //tinyMCE.activeEditor.setContent(contents);
+                tinyMCE.get("content").setContent(contents);
                 console.log('Loaded edited gallery: ' + contents);
             }
         });

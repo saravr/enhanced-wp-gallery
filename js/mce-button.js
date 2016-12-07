@@ -5,11 +5,12 @@
 
         function updateGalleryItem (url, caption, gid, id) {
 
+            id = id.trim();
             var imgId = gid + '-img-' + id;
             var captionId = gid + '-caption-' + id;
 
-            var content = tinyMCE.activeEditor.getContent();
-            tinyMCE.activeEditor.setContent(content);
+            var content = tinyMCE.get("content").getContent();
+            tinyMCE.get("content").setContent(content);
 
             jQuery("#" + imgId).attr('src', url);
             jQuery("#" + captionId).html(caption);
@@ -24,6 +25,7 @@
                 caption = "";
             }
 
+            id = id.trim();
             var imgId = gid + '-img-' + id;
             var captionId = gid + '-caption-' + id;
 
@@ -42,17 +44,18 @@
             var output = '';
             for (i = 0; i < ids.length; i++) {
                 var id = ids[i];
-
                 var att = new wp.media.attachment(id);
                 var url = att.get('url');
                 output += getGalleryItem(url, att.get('caption'), gid, id);
 
                 if (url === undefined) {
-                    var cb = function(att) {
-                        return updateGalleryItem(
-                            att.get('url'), att.get('caption'), gid, id);
-                    };
-                    att.fetch({success:cb});
+                    (function(attx, gidx, idx) {
+                        var cb = function(att) {
+                            return updateGalleryItem(
+                                attx.get('url'), attx.get('caption'), gidx, idx);
+                        };
+                        att.fetch({success:cb});
+                    })(att, gid, id);
                 }
             }
 
