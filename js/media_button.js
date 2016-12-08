@@ -152,6 +152,7 @@ jQuery(function($) {
 
         var outerPanel = jQuery('<div style="overflow-y:hidden;height:660px;background:white;"></div>');
         var header = jQuery('<div style="height:40px;padding-left:20px;"><h1>Edit Gallery</h1></div>');
+        //var tiles = jQuery('<button id="showtile_btn_id">View Tiles</button>');
 
         var buttonTitle = (object.galleryMode === "edit") ? "Update Gallery" : "Insert Gallery";
 
@@ -166,16 +167,16 @@ jQuery(function($) {
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
 
+            tinymce.init({
+                selector: "#" + captionId,
+                menu: {},
+                toolbar: [
+                    "undo redo bold italic link"
+                ]
+            });
             var captionId = captionPfx + '-' + id;
             tinyMCE.execCommand("mceAddEditor", false, captionId);
             tinyMCE.execCommand('mceAddControl', false, captionId);
-//console.log('XXX: ' + tinyMCE.get(captionId));
-//console.log('YYY: ' + JSON.stringify(tinyMCE.get(captionId).controlManager));
-//console.log('ZZZ: ' + tinyMCE.get(captionId).controlManager.get('bold'));
-//tinyMCE.get(captionId).controlManager.get('bold').setDisabled(true);
-//tinyMCE.get(captionId).controlManager.setDisabled('bold', true);
-//tinyMCE.get(captionId).controlManager.remove('bold');
-//tinyMCE.get(captionId).controlManager.'bold').destroy();
 
             var deleteId = 'ewg-delete-' + dt + '-' + id;
             var deleteTag = '#' + deleteId;
