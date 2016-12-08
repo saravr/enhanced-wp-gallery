@@ -134,7 +134,7 @@ jQuery(function($) {
 
             var deleteId = 'ewg-delete-' + dt + '-' + id;
             var deleteTag = '#' + deleteId;
-            var del = "<button class='closeButton' style='background-repeat:no-repeat;height:10px;width:10px;float:right;' id='" + deleteId + "'></button>";
+            var del = "<button class='button-primary button-small' style='float:right;' id='" + deleteId + "'>Remove</button>";
 
             ida += '<div style="height:160px;width:160px;margin-top:10px;margin-right:40px;float:right;"><img style="max-width:100%;max-height:100%;" src="' + url + '"/>' + del + '</div>';
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
@@ -151,11 +151,13 @@ jQuery(function($) {
         console.log('User selected ids: ' + idlist);
 
         var outerPanel = jQuery('<div style="overflow-y:hidden;height:660px;background:white;"></div>');
-        var filler = jQuery('<div style="height:40px;"></div>');
+        var header = jQuery('<div style="height:40px;padding-left:20px;"><h1>Edit Gallery</h1></div>');
 
-        var footer = jQuery("<div style='margin-top:30px;padding-top:10px;padding-right:20px;bottom:0px;height:60px;'><button class='button-primary button-large' style='margin-left:10px;float:right;' id='" + submitId + "'>Insert Gallery</button><button id='" + backid + "' class='button-primary button-large' style='margin-left:10px;float:right;'>Edit Gallery</button></div>");
+        var buttonTitle = (object.galleryMode === "edit") ? "Update Gallery" : "Insert Gallery";
 
-        outerPanel.append(filler);
+        var footer = jQuery("<div style='padding-top:10px;padding-right:20px;bottom:0px;height:60px;'><button class='button-primary button-large' style='margin-left:10px;float:right;' id='" + submitId + "'>" + buttonTitle + "</button><button id='" + backid + "' class='button-primary button-large' style='margin-left:10px;float:right;'>Select Images</button></div>");
+
+        outerPanel.append(header);
         outerPanel.append(panel);
         outerPanel.append(footer);
 
@@ -167,6 +169,13 @@ jQuery(function($) {
             var captionId = captionPfx + '-' + id;
             tinyMCE.execCommand("mceAddEditor", false, captionId);
             tinyMCE.execCommand('mceAddControl', false, captionId);
+//console.log('XXX: ' + tinyMCE.get(captionId));
+//console.log('YYY: ' + JSON.stringify(tinyMCE.get(captionId).controlManager));
+//console.log('ZZZ: ' + tinyMCE.get(captionId).controlManager.get('bold'));
+//tinyMCE.get(captionId).controlManager.get('bold').setDisabled(true);
+//tinyMCE.get(captionId).controlManager.setDisabled('bold', true);
+//tinyMCE.get(captionId).controlManager.remove('bold');
+//tinyMCE.get(captionId).controlManager.'bold').destroy();
 
             var deleteId = 'ewg-delete-' + dt + '-' + id;
             var deleteTag = '#' + deleteId;
