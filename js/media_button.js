@@ -126,7 +126,7 @@ jQuery(function($) {
             var aaa = JSON.stringify(attObj); // TBD !!!
             var att = JSON.parse(aaa);
 
-            var ida = '<div id="att-' + id + '" style="margin-left:40px;resize:vertical;overflow:auto;">';
+            var ida = '<div id="att-' + id + '" style="height:400px;margin-left:40px;resize:vertical;overflow:auto;">';
 
             var titleId = titlePfx + '-' + id;
             var captionId = captionPfx + '-' + id;
@@ -136,13 +136,13 @@ jQuery(function($) {
 
             var deleteId = 'ewg-delete-' + dt + '-' + id;
             var deleteTag = '#' + deleteId;
-            var del = "<button class='button-primary button-small' style='float:right;' id='" + deleteId + "'>Remove</button>";
+            var delButton = "<div style='width:320px;height:40px;'><button class='button-primary button-small ewg-remove-button' style='float:right;margin-bottom:10px;' id='" + deleteId + "'>Remove</button></div>";
 
-            ida += '<div style="height:160px;width:160px;margin-top:10px;margin-right:40px;float:right;"><img style="max-width:100%;max-height:100%;" src="' + url + '"/>' + del + '</div>';
+            ida += '<div style="width:320px;margin-top:10px;margin-right:40px;float:right;">' + delButton + '<img style="float:right;" class="ewg-image" src="' + url + '"/></div>';
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label>&nbsp;<button class='button-primary button-small ewg-button' style='float:right;' id=" + toggleId + ">View Text</button></div><br/><div style='border:1px solid #ddd;'><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
             if (i < (idlist.length - 1)) {
-                ida += "<hr style='margin-top:10px;'/>";
+                ida += "<hr style='margin-top:70px;top:395px;'/>";
             }
             ida += "</div>";
             panel.append(ida);
