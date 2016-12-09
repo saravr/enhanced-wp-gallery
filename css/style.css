@@ -1,3 +1,7 @@
+.ewg-button {
+    outline: none;
+}
+
 .closeButton {
     background: url("../images/cross.png");
     border: none;
