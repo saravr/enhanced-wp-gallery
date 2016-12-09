@@ -172,15 +172,11 @@ jQuery(function($) {
             tinymce.init({
                 selector: "#" + captionId,
                 menu: {},
-                plugins: "link",
-                toolbar: [ "undo redo bold italic link" ]
+                toolbar: [ "bold italic link" ]
             });
+                //plugins: "link",
 
             var captionId = captionPfx + '-' + id;
-/*
-            tinyMCE.execCommand("mceAddEditor", false, captionId);
-            tinyMCE.execCommand('mceAddControl', false, captionId);
-*/
             var toggleId = togglePfx + '-' + id;
             (function(tId, cId) {
                 jQuery("#" + tId).on('click', function(e) {
