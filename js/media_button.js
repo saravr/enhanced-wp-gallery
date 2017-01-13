@@ -1,5 +1,6 @@
 jQuery(function($) {
     var url = ewg_data.ajax_url;
+    var plugins_url = ewg_data.plugins_url;
     var shortcode = 'egallery'; // TBD replace shortcodes below
 
     $(document).ready(function(e){
@@ -140,7 +141,8 @@ jQuery(function($) {
 
             ida += '<div style="width:320px;margin-top:10px;margin-right:40px;float:right;">' + delButton + '<img style="float:right;" class="ewg-image" src="' + url + '"/></div>';
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
-            ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label>&nbsp;<button class='button-primary button-small ewg-button' style='float:right;' id=" + toggleId + ">View Text</button></div><br/><div style='border:1px solid #ddd;'><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
+            ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label>&nbsp;<a href='#' class='ewg-button' style='float:right;' id=" + toggleId + ">View Text</a></div><br/><div style='border:1px solid #ddd;'><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
+
             if (i < (idlist.length - 1)) {
                 ida += "<hr style='margin-top:70px;top:395px;'/>";
             }
@@ -157,7 +159,7 @@ jQuery(function($) {
 
         var buttonTitle = (object.galleryMode === "edit") ? "Update Gallery" : "Insert Gallery";
 
-        var footer = jQuery("<div style='padding-top:10px;padding-right:20px;bottom:0px;height:60px;'><button class='button-primary button-large' style='margin-left:10px;float:right;' id='" + submitId + "'>" + buttonTitle + "</button><button id='" + backid + "' class='button-primary button-large' style='margin-left:10px;float:right;'>Select Images</button></div>");
+        var footer = jQuery("<div style='padding-top:10px;padding-right:20px;bottom:0px;height:60px;'><button class='button-primary button-large' style='margin-left:10px;float:right;' id='" + submitId + "'>" + buttonTitle + "</button><button id='" + backid + "' class='button-primary button-large' style='margin-left:10px;float:right;'>Add Images</button></div>");
 
         outerPanel.append(header);
         outerPanel.append(panel);
@@ -171,8 +173,85 @@ jQuery(function($) {
             tinymce.init({
                 selector: "#" + captionId,
                 menu: {},
-                plugins: "link",
-                toolbar: [ "bold italic link" ]
+                //plugins: "link",
+                toolbar: [ "bold italic | link unlink" ],
+                setup: function(editor) {
+                    editor.addButton('link', {
+                        title: 'Insert Button Link',
+                        image: plugins_url + 'images/icon.png',
+                        cmd: 'link',
+                    });
+            
+                    editor.addCommand('link', function() {
+                        var text = editor.selection.getContent({
+                                       'format': 'html'
+                                   });
+
+                        if (text.length === 0) {
+                            alert('Please select some text to link.');
+                            return;
+                        }
+                    
+                        var defValue = "";
+                        var node = editor.selection.getNode();
+                        if (node.nodeName == "A") {
+                            var nodeContent = editor.selection.getNode().textContent;
+                            if (nodeContent == text) {
+                                defValue = node.href;
+                            }
+                        }
+
+                        var result = prompt('Enter the link', defValue); 
+                        if (!result || result.length === 0) {
+                            if (node.nodeName == "A") { // unlink!
+                                editor.execCommand('mceReplaceContent',
+                                    false, text);
+                            }
+                            return;
+                        }
+
+                        var replaced = '<a class="button" href="' + result + '">' + text + '</a>';
+                        editor.execCommand('mceReplaceContent', false,
+                            replaced);
+                    });
+
+                    editor.addButton('unlink', {
+                        title: 'Remove Link',
+                        image: plugins_url + 'images/icon.png',
+                        cmd: 'unlink',
+                    });
+            
+                    editor.addCommand('unlink', function() {
+                        var text = editor.selection.getContent({
+                                       'format': 'html'
+                                   });
+
+                        if (text.length === 0) {
+                            alert('Please select some text to link.');
+                            return;
+                        }
+
+                        var defValue = "";
+                        var node = editor.selection.getNode();
+                        if (node.nodeName == "A") {
+                            var nodeContent = editor.selection.getNode().textContent;
+                            if (nodeContent == text) {
+                                defValue = node.href;
+                            }
+                        }
+
+                        var result = prompt('Remove link?', defValue); 
+                        if (!result || result.length === 0) {
+                            console.log('Empty result from prompt');
+                            return;
+                        }
+
+                        if (node.nodeName == "A") { // unlink!
+                            editor.execCommand('mceReplaceContent',
+                                false, text);
+                        }
+                    });
+                }
             });
 
             var captionId = captionPfx + '-' + id;

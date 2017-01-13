@@ -52,10 +52,11 @@ class EnhancedWPGallery {
         $postid = isset($post->ID) ? $post->ID : 0;
 
         wp_enqueue_script('media_button', plugins_url('js/media_button.js', __FILE__),
-            array('jquery'), '1.0', true);
+            array('jquery', 'jquery-ui-dialog'), '1.0', true);
         wp_localize_script('media_button', 'ewg_data',
             array(
                 'ajax_url' => admin_url('admin-ajax.php'),
+                'plugins_url' => plugin_dir_url(__FILE__),
                 'post_id' => $postid
             ));
         wp_enqueue_style('eg_style', plugins_url('css/style.css', __FILE__));
