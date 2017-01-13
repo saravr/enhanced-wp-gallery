@@ -1,3 +1,20 @@
+.ewg-image {
+    display: block;
+    max-width: 320px;
+    max-height: 320px;
+    width: auto;
+    height: auto;
+}
+
+.ewg-button {
+    outline: none;
+    outline-width: 0;
+}
+
+.ewg-remove-button {
+    margin-top: 10px;
+}
+
 .closeButton {
     background: url("../images/cross.png");
     border: none;

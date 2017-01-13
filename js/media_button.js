@@ -104,6 +104,7 @@ jQuery(function($) {
         var submitTag = '#' + submitId;
         var titlePfx = 'ewg-title-' + dt;
         var captionPfx = 'ewg-caption-' + dt;
+        var togglePfx = 'ewg-toggle-' + dt;
 
         console.log('BACKTAG: ' + backtag);
         var panel = jQuery('<div id="newgl" style="overflow-y:scroll;height:540px;"></div>');
@@ -125,22 +126,23 @@ jQuery(function($) {
             var aaa = JSON.stringify(attObj); // TBD !!!
             var att = JSON.parse(aaa);
 
-            var ida = '<div id="att-' + id + '" style="margin-left:40px;resize:vertical;overflow:auto;">';
+            var ida = '<div id="att-' + id + '" style="height:400px;margin-left:40px;resize:vertical;overflow:auto;">';
 
-            titleId = titlePfx + '-' + id;
-            captionId = captionPfx + '-' + id;
+            var titleId = titlePfx + '-' + id;
+            var captionId = captionPfx + '-' + id;
+            var toggleId = togglePfx + '-' + id;
 
             var url = att.sizes.thumbnail.url;
 
             var deleteId = 'ewg-delete-' + dt + '-' + id;
             var deleteTag = '#' + deleteId;
-            var del = "<button class='button-primary button-small' style='float:right;' id='" + deleteId + "'>Remove</button>";
+            var delButton = "<div style='width:320px;height:40px;'><button class='button-primary button-small ewg-remove-button' style='float:right;margin-bottom:10px;' id='" + deleteId + "'>Remove</button></div>";
 
-            ida += '<div style="height:160px;width:160px;margin-top:10px;margin-right:40px;float:right;"><img style="max-width:100%;max-height:100%;" src="' + url + '"/>' + del + '</div>';
+            ida += '<div style="width:320px;margin-top:10px;margin-right:40px;float:right;">' + delButton + '<img style="float:right;" class="ewg-image" src="' + url + '"/></div>';
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
-            ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label></div><br/><div style='border:1px solid #ddd;'><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
+            ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label>&nbsp;<button class='button-primary button-small ewg-button' style='float:right;' id=" + toggleId + ">View Text</button></div><br/><div style='border:1px solid #ddd;'><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
             if (i < (idlist.length - 1)) {
-                ida += "<hr style='margin-top:10px;'/>";
+                ida += "<hr style='margin-top:70px;top:395px;'/>";
             }
             ida += "</div>";
             panel.append(ida);
@@ -166,9 +168,23 @@ jQuery(function($) {
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
 
+            tinymce.init({
+                selector: "#" + captionId,
+                menu: {},
+                plugins: "link",
+                toolbar: [ "bold italic link" ]
+            });
+
             var captionId = captionPfx + '-' + id;
-            tinyMCE.execCommand("mceAddEditor", false, captionId);
-            tinyMCE.execCommand('mceAddControl', false, captionId);
+            var toggleId = togglePfx + '-' + id;
+            (function(tId, cId) {
+                jQuery("#" + tId).on('click', function(e) {
+                    tinyMCE.execCommand('mceToggleEditor', false, cId);
+                    jQuery(this).text(function (i, text) {
+                        return text === "View Text" ? "View Styled" : "View Text";
+                    });
+                });
+            })(toggleId, captionId);
 
             var deleteId = 'ewg-delete-' + dt + '-' + id;
             var deleteTag = '#' + deleteId;
