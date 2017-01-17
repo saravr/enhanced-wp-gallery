@@ -3,7 +3,7 @@
  * Plugin Name: Enhanced Wordpress Gallery
  * Description: Plugin for Enhanced Wordpress Gallery
  * Author: Sarav R
- * Version: 0.1
+ * Version: 0.3
  */
 
 class EnhancedWPGallery {
@@ -79,8 +79,10 @@ class EnhancedWPGallery {
             $caption = $att['caption'];
 
             $att_post = get_post($attid); 
+            $post_title = $att_post->post_title;
             $excerpt = $att_post->post_excerpt;
-            if (strcmp($caption, $excerpt) !== 0) {
+            if (strcmp($title, $post_title) !== 0 ||
+                strcmp($caption, $excerpt) !== 0) {
                 $newid = $this->clone_attachment($attid, $title, $caption);
                 array_push($atts, $newid);
             } else {

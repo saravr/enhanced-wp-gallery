@@ -37,6 +37,7 @@
             output += '<dd id="' + captionId + '" class="wp-caption-text gallery-caption">';
             output += caption;
             output += '</dd></dl>';
+            output += '<br style="clear: both;">';
             return output;
         }
 
@@ -70,10 +71,7 @@
 
             var dt = Date.now();
             var gid = "gl2-id-" + dt;
-            var output = '<div class="wpview-wrap" data-wpview-text="' + encodedData + '" data-wpview-type="gallery" data-mce-selected="1">';
-            output += '<p class="wpview-selection-before">&nbsp;</p>';
-            output += '<div class="wpview-body" contenteditable="false">';
-            output += '<div class="wpview-content wpview-type-gallery">';
+            var output = '<div class="wpview wpview-wrap" data-wpview-text="' + encodedData + '" data-wpview-type="gallery" contenteditable="false" data-mce-selected="1">';
             output += '<div class="gallery gallery-columns-1" id="' + gid + '">';
 
             data = data.trim();
@@ -81,12 +79,8 @@
             var ids = data.split(",");
             output += addMedia(gid, ids);
 
-            output += '<br style="clear: both;">';
             output += '</div>';
-            output += '</div>';
-            output += '<div class="wpview-clipboard" contenteditable="true">' + all + '</div>';
-            output += '</div>';
-            output += '<p class="wpview-selection-after">&nbsp;</p>';
+            output += '<span class="wpview-end"></span>';
             output += '</div>';
 
             return output;
@@ -104,7 +98,9 @@
 
         editor.on('BeforeSetcontent', function(event) {
 
+console.log("BEFORE: " + event.content);
             event.content = replaceShortcodes(event.content);
+console.log("AFTER: " + event.content);
         });
     })
 })();

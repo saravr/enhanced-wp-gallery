@@ -1,9 +1,17 @@
 jQuery(function($) {
+
     var url = ewg_data.ajax_url;
     var plugins_url = ewg_data.plugins_url;
     var shortcode = 'egallery'; // TBD replace shortcodes below
 
     $(document).ready(function(e){
+
+        //preventing loss of focus
+        $(document).on('focusin', function(e) {
+            if ($(e.target).closest(".mce-window").length) {
+                e.stopImmediatePropagation();
+            }
+        });
         $('#insert-my-media').click({mode: 'new'}, open_media_window);
 
         jQuery(document).off('click', '.dashicons-edit');
@@ -173,85 +181,85 @@ jQuery(function($) {
             tinymce.init({
                 selector: "#" + captionId,
                 menu: {},
-                //plugins: "link",
-                toolbar: [ "bold italic | link unlink" ],
-                setup: function(editor) {
-                    editor.addButton('link', {
-                        title: 'Insert Button Link',
-                        image: plugins_url + 'images/icon.png',
-                        cmd: 'link',
-                    });
-            
-                    editor.addCommand('link', function() {
-                        var text = editor.selection.getContent({
-                                       'format': 'html'
-                                   });
-
-                        if (text.length === 0) {
-                            alert('Please select some text to link.');
-                            return;
-                        }
-                    
-                        var defValue = "";
-                        var node = editor.selection.getNode();
-                        if (node.nodeName == "A") {
-                            var nodeContent = editor.selection.getNode().textContent;
-                            if (nodeContent == text) {
-                                defValue = node.href;
-                            }
-                        }
-
-                        var result = prompt('Enter the link', defValue); 
-                        if (!result || result.length === 0) {
-                            if (node.nodeName == "A") { // unlink!
-                                editor.execCommand('mceReplaceContent',
-                                    false, text);
-                            }
-                            return;
-                        }
-
-                        var replaced = '<a class="button" href="' + result + '">' + text + '</a>';
-                        editor.execCommand('mceReplaceContent', false,
-                            replaced);
-                    });
-
-                    editor.addButton('unlink', {
-                        title: 'Remove Link',
-                        image: plugins_url + 'images/icon.png',
-                        cmd: 'unlink',
-                    });
-            
-                    editor.addCommand('unlink', function() {
-                        var text = editor.selection.getContent({
-                                       'format': 'html'
-                                   });
-
-                        if (text.length === 0) {
-                            alert('Please select some text to link.');
-                            return;
-                        }
-
-                        var defValue = "";
-                        var node = editor.selection.getNode();
-                        if (node.nodeName == "A") {
-                            var nodeContent = editor.selection.getNode().textContent;
-                            if (nodeContent == text) {
-                                defValue = node.href;
-                            }
-                        }
-
-                        var result = prompt('Remove link?', defValue); 
-                        if (!result || result.length === 0) {
-                            console.log('Empty result from prompt');
-                            return;
-                        }
-
-                        if (node.nodeName == "A") { // unlink!
-                            editor.execCommand('mceReplaceContent',
-                                false, text);
-                        }
-                    });
-                }
+                plugins: "tabfocus,paste,media,fullscreen,wordpress,wpeditimage,wpgallery,wplink,wpdialogs",
+                toolbar: "bold italic | link unlink",
+                // setup: function(editor) {
+                //     editor.addButton('link', {
+                //         title: 'Insert Button Link',
+                //         image: plugins_url + 'images/icon.png',
+                //         cmd: 'link',
+                //     });
+                //
+                //     editor.addCommand('link', function() {
+                //         var text = editor.selection.getContent({
+                //                        'format': 'html'
+                //                    });
+                //
+                //         if (text.length === 0) {
+                //             alert('Please select some text to link.');
+                //             return;
+                //         }
+                //
+                //         var defValue = "";
+                //         var node = editor.selection.getNode();
+                //         if (node.nodeName == "A") {
+                //             var nodeContent = editor.selection.getNode().textContent;
+                //             if (nodeContent == text) {
+                //                 defValue = node.href;
+                //             }
+                //         }
+                //
+                //         var result = prompt('Enter the link', defValue);
+                //         if (!result || result.length === 0) {
+                //             if (node.nodeName == "A") { // unlink!
+                //                 editor.execCommand('mceReplaceContent',
+                //                     false, text);
+                //             }
+                //             return;
+                //         }
+                //
+                //         var replaced = '<a class="button" href="' + result + '">' + text + '</a>';
+                //         editor.execCommand('mceReplaceContent', false,
+                //             replaced);
+                //     });
+                //
+                //     editor.addButton('unlink', {
+                //         title: 'Remove Link',
+                //         image: plugins_url + 'images/icon.png',
+                //         cmd: 'unlink',
+                //     });
+                //
+                //     editor.addCommand('unlink', function() {
+                //         var text = editor.selection.getContent({
+                //                        'format': 'html'
+                //                    });
+                //
+                //         if (text.length === 0) {
+                //             alert('Please select some text to link.');
+                //             return;
+                //         }
+                //
+                //         var defValue = "";
+                //         var node = editor.selection.getNode();
+                //         if (node.nodeName == "A") {
+                //             var nodeContent = editor.selection.getNode().textContent;
+                //             if (nodeContent == text) {
+                //                 defValue = node.href;
+                //             }
+                //         }
+                //
+                //         var result = prompt('Remove link?', defValue);
+                //         if (!result || result.length === 0) {
+                //             console.log('Empty result from prompt');
+                //             return;
+                //         }
+                //
+                //         if (node.nodeName == "A") { // unlink!
+                //             editor.execCommand('mceReplaceContent',
+                //                 false, text);
+                //         }
+                //     });
+                // }
             });
 
             var captionId = captionPfx + '-' + id;
