@@ -28,6 +28,8 @@ class EnhancedWPGallery {
 
         add_filter('mce_external_plugins', array($this ,'ewg_mce_external_plugins'));
         add_filter('mce_buttons', array($this, 'ewg_mce_buttons'));
+
+        add_shortcode(self::$shortcode, array($this, 'replace_egallery_shortcode'));
     }
 
     function ewg_mce_external_plugins($plugin_array) {
@@ -99,6 +101,7 @@ class EnhancedWPGallery {
     private function clone_attachment ($parent_id, $title, $caption) {
         global $wpdb;
 
+        $caption = stripslashes($caption);
         $clone_id = '';
         $table_name = $wpdb->prefix . "posts";
         $sql = 'SELECT * FROM ' . $table_name . ' WHERE id = ' . $parent_id;
@@ -150,6 +153,13 @@ class EnhancedWPGallery {
 
         $value = get_post_meta($parent_id, $key, true);
         return add_post_meta($clone_id, $key, $value);
+    }
+
+    function replace_egallery_shortcode ($atts) {
+
+        $ids = $atts['ids'];
+        $sc = '[gallery ids="' . $ids . '" columns="1" size="full"]';
+        return do_shortcode($sc);
     }
 }
 

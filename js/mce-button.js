@@ -98,9 +98,7 @@
 
         editor.on('BeforeSetcontent', function(event) {
 
-console.log("BEFORE: " + event.content);
             event.content = replaceShortcodes(event.content);
-console.log("AFTER: " + event.content);
         });
     })
 })();
