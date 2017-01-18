@@ -117,6 +117,7 @@ jQuery(function($) {
 
         console.log('BACKTAG: ' + backtag);
         var panel = jQuery('<div id="newgl" style="overflow-y:scroll;height:540px;"></div>');
+        panel.sortable();
         panel.append("<hr style='clear:left;'/>");
 
         if (idlist === undefined) {
@@ -183,83 +184,6 @@ jQuery(function($) {
                 menu: {},
                 plugins: "tabfocus,paste,media,fullscreen,wordpress,wpeditimage,wpgallery,wplink,wpdialogs",
                 toolbar: "bold italic | link unlink",
-                // setup: function(editor) {
-                //     editor.addButton('link', {
-                //         title: 'Insert Button Link',
-                //         image: plugins_url + 'images/icon.png',
-                //         cmd: 'link',
-                //     });
-                //
-                //     editor.addCommand('link', function() {
-                //         var text = editor.selection.getContent({
-                //                        'format': 'html'
-                //                    });
-                //
-                //         if (text.length === 0) {
-                //             alert('Please select some text to link.');
-                //             return;
-                //         }
-                //
-                //         var defValue = "";
-                //         var node = editor.selection.getNode();
-                //         if (node.nodeName == "A") {
-                //             var nodeContent = editor.selection.getNode().textContent;
-                //             if (nodeContent == text) {
-                //                 defValue = node.href;
-                //             }
-                //         }
-                //
-                //         var result = prompt('Enter the link', defValue);
-                //         if (!result || result.length === 0) {
-                //             if (node.nodeName == "A") { // unlink!
-                //                 editor.execCommand('mceReplaceContent',
-                //                     false, text);
-                //             }
-                //             return;
-                //         }
-                //
-                //         var replaced = '<a class="button" href="' + result + '">' + text + '</a>';
-                //         editor.execCommand('mceReplaceContent', false,
-                //             replaced);
-                //     });
-                //
-                //     editor.addButton('unlink', {
-                //         title: 'Remove Link',
-                //         image: plugins_url + 'images/icon.png',
-                //         cmd: 'unlink',
-                //     });
-                //
-                //     editor.addCommand('unlink', function() {
-                //         var text = editor.selection.getContent({
-                //                        'format': 'html'
-                //                    });
-                //
-                //         if (text.length === 0) {
-                //             alert('Please select some text to link.');
-                //             return;
-                //         }
-                //
-                //         var defValue = "";
-                //         var node = editor.selection.getNode();
-                //         if (node.nodeName == "A") {
-                //             var nodeContent = editor.selection.getNode().textContent;
-                //             if (nodeContent == text) {
-                //                 defValue = node.href;
-                //             }
-                //         }
-                //
-                //         var result = prompt('Remove link?', defValue);
-                //         if (!result || result.length === 0) {
-                //             console.log('Empty result from prompt');
-                //             return;
-                //         }
-                //
-                //         if (node.nodeName == "A") { // unlink!
-                //             editor.execCommand('mceReplaceContent',
-                //                 false, text);
-                //         }
-                //     });
-                // }
             });
 
             var captionId = captionPfx + '-' + id;
@@ -299,12 +223,19 @@ jQuery(function($) {
         jQuery(backtag).click(function(e) { backHandler(idlist, object); });
 
         jQuery(submitTag).off('click');
-        jQuery(submitTag).click(function(e) { submitHandler(dt, idlist, object); });
+        jQuery(submitTag).click(function(e) { submitHandler(dt, object); });
 
         object.window.open();
     }
 
-    var submitHandler = function (dt, idlist, object) {
+    var submitHandler = function (dt, object) {
+
+        var idlist = [];
+        divlist = jQuery("#newgl").children("div[id]");
+        for (i = 0; i < divlist.length; i++) {
+            var newId = divlist[i].id.replace("att-", "");
+            idlist.push(newId);
+        }
 
         var mdata = [];
         for (i = 0; i < idlist.length; i++) {

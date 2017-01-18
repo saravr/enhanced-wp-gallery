@@ -3,7 +3,7 @@
  * Plugin Name: Enhanced Wordpress Gallery
  * Description: Plugin for Enhanced Wordpress Gallery
  * Author: Sarav R
- * Version: 0.3
+ * Version: 0.4
  */
 
 class EnhancedWPGallery {
