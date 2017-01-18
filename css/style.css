@@ -22,7 +22,8 @@
     height: 20px;
     object-fit: contain;
 }
+/*
 #wp-link-wrap, div.mce-inline-toolbar-grp{
-    z-index: 160001!important;
+    z-index: 160000!important;
 }
-
+*/

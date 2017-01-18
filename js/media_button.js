@@ -254,10 +254,12 @@ jQuery(function($) {
             var titleId = 'ewg-title-' + dt + '-' + id;
             var title = jQuery("#" + titleId).val();
             console.log(dt + ": title: " + title);
+            title = (title !== undefined) ? title : "";
 
             var captionId = 'ewg-caption-' + dt + '-' + id;
             //var caption = jQuery("#" + captionId).val();
-            var caption = tinyMCE.get(captionId).getContent();
+            var captionObj = tinyMCE.get(captionId);
+            var caption = (captionObj != null) ? captionObj.getContent() : "";
 
             console.log(dt + ": caption: " + caption);
 
@@ -281,6 +283,7 @@ jQuery(function($) {
             }
         });
 
+        jQuery("#newgl").remove();
         object.window.close();
         return false;
     }
@@ -301,6 +304,7 @@ jQuery(function($) {
         object.window.on('select', function(arg) { selectHandler(object); });
         console.log('Saved for selection: ' + idlist);
         showSavedSelection(idlist, object);
+        jQuery("#newgl").remove();
         object.window.open();
     }
 
