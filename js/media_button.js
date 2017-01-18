@@ -117,7 +117,16 @@ jQuery(function($) {
 
         console.log('BACKTAG: ' + backtag);
         var panel = jQuery('<div id="newgl" style="overflow-y:scroll;height:540px;"></div>');
-        panel.sortable();
+        panel.sortable({
+            stop: function (event, ui) {
+                var lst = jQuery("#newgl .ewg-caption")
+                for (i = 0; i < lst.length; i++) {
+                    var editorId = lst[i].id;
+                    tinyMCE.get(editorId).remove();
+                    tinyMCE.execCommand("mceAddEditor", false, editorId);
+                }
+            }
+        });
         panel.append("<hr style='clear:left;'/>");
 
         if (idlist === undefined) {
@@ -136,7 +145,7 @@ jQuery(function($) {
             var aaa = JSON.stringify(attObj); // TBD !!!
             var att = JSON.parse(aaa);
 
-            var ida = '<div id="att-' + id + '" style="height:400px;margin-left:40px;resize:vertical;overflow:auto;">';
+            var ida = '<div class="ewg-att" id="att-' + id + '" style="height:400px;margin-left:40px;resize:vertical;overflow:auto;">';
 
             var titleId = titlePfx + '-' + id;
             var captionId = captionPfx + '-' + id;
@@ -150,7 +159,7 @@ jQuery(function($) {
 
             ida += '<div style="width:320px;margin-top:10px;margin-right:40px;float:right;">' + delButton + '<img style="float:right;" class="ewg-image" src="' + url + '"/></div>';
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
-            ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label>&nbsp;<a href='#' class='ewg-button' style='float:right;' id=" + toggleId + ">View Text</a></div><br/><div style='border:1px solid #ddd;'><textarea id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
+            ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label>&nbsp;<a href='#' class='ewg-button' style='float:right;' id=" + toggleId + ">View Text</a></div><br/><div style='border:1px solid #ddd;'><textarea class='ewg-caption' id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
 
             if (i < (idlist.length - 1)) {
                 ida += "<hr style='margin-top:70px;top:395px;'/>";
