@@ -150,8 +150,7 @@ jQuery(function($) {
             var aaa = JSON.stringify(attObj); // TBD !!!
             var att = JSON.parse(aaa);
 
-            var ida = '<div class="ewg-att" id="att-' + id + '" style="padding-bottom:20px;margin-left:40px;resize:vertical;">';
-// removed overflow:auto 1/18/17 causing overlap issue
+            var ida = '<div class="ewg-att" id="att-' + id + '" style="padding-bottom:20px;margin-left:40px;height:400px;resize:vertical;">';
 
             var titleId = titlePfx + '-' + id;
             var captionId = captionPfx + '-' + id;
