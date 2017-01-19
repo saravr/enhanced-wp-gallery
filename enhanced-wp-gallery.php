@@ -52,14 +52,16 @@ class EnhancedWPGallery {
         global $post;
 
         $postid = isset($post->ID) ? $post->ID : 0;
+        $legacy_ss = $this->has_legacy_gallery($postid);
 
         wp_enqueue_script('media_button', plugins_url('js/media_button.js', __FILE__),
-            array('jquery', 'jquery-ui-dialog'), '1.0', true);
+            array('jquery', 'jquery-ui-dialog'), '1.1', true);
         wp_localize_script('media_button', 'ewg_data',
             array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'plugins_url' => plugin_dir_url(__FILE__),
-                'post_id' => $postid
+                'post_id' => $postid,
+                'legacy_ss' => $legacy_ss
             ));
         wp_enqueue_style('eg_style', plugins_url('css/style.css', __FILE__));
     }
@@ -160,6 +162,19 @@ class EnhancedWPGallery {
         $ids = $atts['ids'];
         $sc = '[gallery ids="' . $ids . '" columns="1" size="full"]';
         return do_shortcode($sc);
+    }
+
+    private function has_legacy_gallery ($postid) {
+
+        if (get_post_format($postid) == "gallery") {
+            $content_post = get_post($postid);
+            $content = $content_post->post_content;
+            if (strpos($content, '[gallery') !== false) {
+                return "yes";
+            }
+        }
+
+        return "no";
     }
 }
 

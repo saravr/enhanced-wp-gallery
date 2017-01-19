@@ -6,6 +6,11 @@ jQuery(function($) {
 
     $(document).ready(function(e){
 
+        if (ewg_data.legacy_ss == "yes") {
+            console.log('Post has legacy slideshow, ignore');
+            return;
+        }
+
         //preventing loss of focus
         $(document).on('focusin', function(e) {
             if ($(e.target).closest(".mce-window").length) {
@@ -145,7 +150,8 @@ jQuery(function($) {
             var aaa = JSON.stringify(attObj); // TBD !!!
             var att = JSON.parse(aaa);
 
-            var ida = '<div class="ewg-att" id="att-' + id + '" style="height:400px;margin-left:40px;resize:vertical;overflow:auto;">';
+            var ida = '<div class="ewg-att" id="att-' + id + '" style="padding-bottom:20px;margin-left:40px;resize:vertical;">';
+// removed overflow:auto 1/18/17 causing overlap issue
 
             var titleId = titlePfx + '-' + id;
             var captionId = captionPfx + '-' + id;
@@ -155,15 +161,12 @@ jQuery(function($) {
 
             var deleteId = 'ewg-delete-' + dt + '-' + id;
             var deleteTag = '#' + deleteId;
-            var delButton = "<div style='width:320px;height:40px;'><button class='button-primary button-small ewg-remove-button' style='float:right;margin-bottom:10px;' id='" + deleteId + "'>Remove</button></div>";
+            var delButton = "<div style='width:320px;'><button class='button-primary button-small ewg-remove-button' style='float:right;margin-bottom:10px;' id='" + deleteId + "'>Remove</button></div>";
 
-            ida += '<div style="width:320px;margin-top:10px;margin-right:40px;float:right;">' + delButton + '<img style="float:right;" class="ewg-image" src="' + url + '"/></div>';
+            ida += '<div style="width:320px;margin-top:10px;margin-right:40px;margin-bottom:40px;float:right;">' + delButton + '<img style="float:right;" class="ewg-image" src="' + url + '"/></div>';
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label>&nbsp;<a href='#' class='ewg-button' style='float:right;' id=" + toggleId + ">View Text</a></div><br/><div style='border:1px solid #ddd;'><textarea class='ewg-caption' id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
 
-            if (i < (idlist.length - 1)) {
-                ida += "<hr style='margin-top:70px;top:395px;'/>";
-            }
             ida += "</div>";
             panel.append(ida);
         }
