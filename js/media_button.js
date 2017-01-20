@@ -129,7 +129,11 @@ jQuery(function($) {
         var p;
         if (!refresh) {
             jQuery("#" + pId).remove();
-            p = jQuery('<div id="' + pId + '" style="overflow-y:scroll;height:540px;"></div>');
+            var style = 'style="overflow-y:scroll;height:540px;"';
+            if (panelType === "thumbnail") {
+                style = 'style="overflow-y:scroll;height:540px;overflow-x:hidden;max-width:100%;"';
+            }
+            p = jQuery('<div id="' + pId + '" ' + style + '></div>');
             if (sortable) {
                 p.sortable();
             }
@@ -169,7 +173,8 @@ jQuery(function($) {
                 ida += "</div>";
                 p.append(ida);
             } else {
-                var tnImg = '<div id="att-tn-' + id + '" style="width:120px;height:120px;display:table-cell;"><img style="height:120px;width:auto;max-width:120px;margin:20px;" class="ewg-tn-image" src="' + url + '"/></div>';
+                var tnImg = '<div id="att-tn-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;"><img style="height:150px;width:auto;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
+                //var tnImg = '<div id="att-tn-' + id + '" class="attachment-preview thumbnail centered" style="width:150px;height:150px;display:inline-block;margin:10px;background:url("' + url + '");"></div>';
                 p.append(tnImg);
             }
         }
