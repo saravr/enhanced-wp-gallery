@@ -169,7 +169,7 @@ jQuery(function($) {
                 ida += "</div>";
                 p.append(ida);
             } else {
-                var tnImg = '<div id="att-tn-' + id + '" style="width:120px;height:120px;display:table-cell;"><img style="margin:20px;" class="ewg-tn-image" src="' + url + '"/></div>';
+                var tnImg = '<div id="att-tn-' + id + '" style="width:120px;height:120px;display:table-cell;"><img style="height:120px;width:auto;max-width:120px;margin:20px;" class="ewg-tn-image" src="' + url + '"/></div>';
                 p.append(tnImg);
             }
         }
