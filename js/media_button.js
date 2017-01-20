@@ -107,9 +107,28 @@ jQuery(function($) {
         return false;
     }
 
+    var showPanel = function (p) {
+
+        console.log("Showing panel: " + p);
+        if (p === "thumbnail") {
+            jQuery("#ewg-detail-panel").hide();
+            jQuery("#ewg-thumbnail-panel").show();
+        } else {
+            jQuery("#ewg-thumbnail-panel").hide();
+            jQuery("#ewg-detail-panel").show();
+        }
+    }
+
+    var removePanel = function () {
+
+        jQuery("#ewg-outer-panel").remove();
+        jQuery("#ewg-panel").remove();
+    }
+
     var selectHandler = function (object, idlist) {
 
         console.log('Select handler invoked ... ');
+        removePanel();
 
         var dt = Date.now();
         var backid = 'ewg-back-' + dt;
@@ -120,19 +139,14 @@ jQuery(function($) {
         var captionPfx = 'ewg-caption-' + dt;
         var togglePfx = 'ewg-toggle-' + dt;
 
-        console.log('BACKTAG: ' + backtag);
-        var panel = jQuery('<div id="newgl" style="overflow-y:scroll;height:540px;"></div>');
-        panel.sortable({
-            stop: function (event, ui) {
-                var lst = jQuery("#newgl .ewg-caption")
-                for (i = 0; i < lst.length; i++) {
-                    var editorId = lst[i].id;
-                    tinyMCE.get(editorId).remove();
-                    tinyMCE.execCommand("mceAddEditor", false, editorId);
-                }
-            }
-        });
-        panel.append("<hr style='clear:left;'/>");
+        var panel = jQuery('<div id="ewg-panel"></div>');
+        var tnPanel = jQuery('<div id="ewg-thumbnail-panel" style="overflow-y:scroll;height:540px;"></div>');
+        tnPanel.sortable();
+        tnPanel.append("<hr style='clear:left;'/>");
+        //tnPanel.append("Placeholder for thumbnails");
+
+        var dtPanel = jQuery('<div id="ewg-detail-panel" style="overflow-y:scroll;height:540px;"></div>');
+        dtPanel.append("<hr style='clear:left;'/>");
 
         if (idlist === undefined) {
             var list = object.window.state().get('selection').toJSON();
@@ -160,32 +174,63 @@ jQuery(function($) {
 
             var deleteId = 'ewg-delete-' + dt + '-' + id;
             var deleteTag = '#' + deleteId;
-            var delButton = "<div style='width:320px;'><button class='button-primary button-small ewg-remove-button' style='float:right;margin-bottom:10px;' id='" + deleteId + "'>Remove</button></div>";
+            var delButton = "<div style='width:320px;height:40px;'><button class='button-primary button-small ewg-remove-button' style='float:right;margin-bottom:10px;' id='" + deleteId + "'>Remove</button></div>";
 
             ida += '<div style="width:320px;margin-top:10px;margin-right:40px;margin-bottom:40px;float:right;">' + delButton + '<img style="float:right;" class="ewg-image" src="' + url + '"/></div>';
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
             ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label>&nbsp;<a href='#' class='ewg-button' style='float:right;' id=" + toggleId + ">View Text</a></div><br/><div style='border:1px solid #ddd;'><textarea class='ewg-caption' id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
 
             ida += "</div>";
-            panel.append(ida);
+            dtPanel.append(ida);
+
+            var tnImg = '<div style="width:120px;height:120px;display:table-cell;"><img style="margin:20px;" class="ewg-tn-image" src="' + url + '"/></div>';
+            tnPanel.append(tnImg);
         }
 
-        panel.append("<hr style='clear:left;'/>");
+        dtPanel.append("<hr style='clear:left;'/>");
 
         console.log('User selected ids: ' + idlist);
 
-        var outerPanel = jQuery('<div style="overflow-y:hidden;height:660px;background:white;"></div>');
-        var header = jQuery('<div style="height:40px;padding-left:20px;"><h1>Edit Gallery</h1></div>');
+        var outerPanel = jQuery('<div id="ewg-outer-panel" style="overflow-y:hidden;height:660px;background:white;"></div>');
+        var headingHtml = `
+<div style="height:40px;padding-left:20px;width:100%;">
+  <div style="display:table-cell;width:89%;">
+    <h1>Edit Gallery</h1>
+  </div>
+  <div style="display:table-cell;width:20%;">
+    <a href="#" id="ewg-tile-view">Tile View</a>
+    &nbsp;
+    <a href="#" id="ewg-detail-view">Details View</a>
+  </div>
+</div>'
+`;
+        var header = jQuery(headingHtml);
 
         var buttonTitle = (object.galleryMode === "edit") ? "Update Gallery" : "Insert Gallery";
 
         var footer = jQuery("<div style='padding-top:10px;padding-right:20px;bottom:0px;height:60px;'><button class='button-primary button-large' style='margin-left:10px;float:right;' id='" + submitId + "'>" + buttonTitle + "</button><button id='" + backid + "' class='button-primary button-large' style='margin-left:10px;float:right;'>Add Images</button></div>");
+
+        panel.append(tnPanel);
+        panel.append(dtPanel);
 
         outerPanel.append(header);
         outerPanel.append(panel);
         outerPanel.append(footer);
 
         jQuery(".media-modal-content").replaceWith(outerPanel);
+        showPanel("detail");
+
+        var tileView = jQuery("#ewg-tile-view");
+        tileView.off('click');
+        tileView.on('click', function(e) {
+            showPanel("thumbnail");
+        });
+
+        var detailView = jQuery("#ewg-detail-view");
+        detailView.off('click');
+        detailView.on('click', function(e) {
+            showPanel("detail");
+        });
 
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
@@ -242,7 +287,7 @@ jQuery(function($) {
     var submitHandler = function (dt, object) {
 
         var idlist = [];
-        divlist = jQuery("#newgl").children("div[id]");
+        divlist = jQuery("#ewg-detail-panel").children("div[id]");
         for (i = 0; i < divlist.length; i++) {
             var newId = divlist[i].id.replace("att-", "");
             idlist.push(newId);
@@ -285,7 +330,7 @@ jQuery(function($) {
             }
         });
 
-        jQuery("#newgl").remove();
+        removePanel();
         object.window.close();
         return false;
     }
@@ -306,7 +351,7 @@ jQuery(function($) {
         object.window.on('select', function(arg) { selectHandler(object); });
         console.log('Saved for selection: ' + idlist);
         showSavedSelection(idlist, object);
-        jQuery("#newgl").remove();
+        removePanel();
         object.window.open();
     }
 
@@ -317,7 +362,6 @@ jQuery(function($) {
             return;
         }
 
-        //var self = object;
         var callback = function () {
             console.log('Showing saved selection with idlist: ' + idlist);
             var selection = object.window.state().get('selection')
