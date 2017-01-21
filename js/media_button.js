@@ -123,7 +123,7 @@ jQuery(function($) {
         jQuery("#ewg-panel").remove();
     }
 
-    var createPanel = function (object, idlist, dt, panelType, sortable, refresh = false) {
+    var createPanel = function (object, idlist, dt, panelType, refresh = false) {
 
         var pId = "ewg-" + panelType + "-panel";
         var p;
@@ -134,14 +134,15 @@ jQuery(function($) {
                 style = 'style="overflow-y:scroll;height:540px;overflow-x:hidden;max-width:100%;"';
             }
             p = jQuery('<div id="' + pId + '" ' + style + '></div>');
-            if (sortable) {
+            if (panelType === "thumbnail") {
                 p.sortable();
             }
-            p.append("<hr style='clear:left;'/>");
         } else {
             p = jQuery("#" + pId);
             p.empty();
+            tinymce.remove();
         }
+        p.append("<hr style='clear:left;'/>");
 
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
@@ -186,9 +187,9 @@ jQuery(function($) {
         return p;
     }
 
-    var refreshPanel = function (object, idlist, dt, panelType, sortable) {
+    var refreshPanel = function (object, idlist, dt, panelType) {
 
-        createPanel(object, idlist, dt, panelType, sortable, true);
+        createPanel(object, idlist, dt, panelType, true);
     }
 
     var configurePanel = function (idlist, dt) {
@@ -206,7 +207,6 @@ jQuery(function($) {
                 plugins: "tabfocus,paste,media,fullscreen,wordpress,wpeditimage,wpgallery,wplink,wpdialogs",
                 toolbar: "bold italic | link unlink",
             });
-// TBD -- memory leak??
 
             (function(tId, cId) {
                 jQuery("#" + tId).on('click', function(e) {
@@ -282,10 +282,10 @@ jQuery(function($) {
 
         var footer = jQuery("<div style='padding-top:10px;padding-right:20px;bottom:0px;height:60px;'><button class='button-primary button-large' style='margin-left:10px;float:right;' id='" + submitId + "'>" + buttonTitle + "</button><button id='" + backid + "' class='button-primary button-large' style='margin-left:10px;float:right;'>Add Images</button></div>");
 
-        var tnPanel = createPanel(object, idlist, dt, "thumbnail", true);
+        var tnPanel = createPanel(object, idlist, dt, "thumbnail");
         panel.append(tnPanel);
 
-        var dtPanel = createPanel(object, idlist, dt, "detail", false);
+        var dtPanel = createPanel(object, idlist, dt, "detail");
         panel.append(dtPanel);
 
         outerPanel.append(header);
@@ -298,14 +298,14 @@ jQuery(function($) {
         var tileView = jQuery("#ewg-tile-view");
         tileView.off('click');
         tileView.on('click', function(e) {
-            refreshPanel(object, idlist, dt, "thumbnail", true);
+            refreshPanel(object, idlist, dt, "thumbnail");
             showPanel("thumbnail");
         });
 
         var detailView = jQuery("#ewg-detail-view");
         detailView.off('click');
         detailView.on('click', function(e) {
-            refreshPanel(object, idlist, dt, "detail", false);
+            refreshPanel(object, idlist, dt, "detail");
             configurePanel(idlist, dt);
             showPanel("detail");
         });
