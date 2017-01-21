@@ -157,7 +157,7 @@ jQuery(function($) {
                 var captionPfx = 'ewg-caption-' + dt;
                 var togglePfx = 'ewg-toggle-' + dt;
 
-                var ida = '<div class="ewg-att" id="att-' + id + '" style="padding-bottom:20px;margin-left:40px;height:400px;resize:vertical;">';
+                var ida = '<div class="ewg-att" id="att-detail-' + id + '" style="padding-bottom:20px;margin-left:40px;height:400px;resize:vertical;">';
 
                 var titleId = titlePfx + '-' + id;
                 var captionId = captionPfx + '-' + id;
@@ -174,8 +174,8 @@ jQuery(function($) {
                 ida += "</div>";
                 p.append(ida);
             } else {
-                var tnImg = '<div id="att-tn-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;"><img style="height:150px;width:auto;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
-                //var tnImg = '<div id="att-tn-' + id + '" class="attachment-preview thumbnail centered" style="width:150px;height:150px;display:inline-block;margin:10px;background:url("' + url + '");"></div>';
+                var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;"><img style="height:150px;width:auto;max-width:150px;" class="ewg-thumbnail-image" src="' + url + '"/></div>';
+                //var tnImg = '<div id="att-thumbnail-' + id + '" class="attachment-preview thumbnail centered" style="width:150px;height:150px;display:inline-block;margin:10px;background:url("' + url + '");"></div>';
                 p.append(tnImg);
             }
         }
@@ -222,7 +222,7 @@ jQuery(function($) {
             jQuery(deleteTag).off('click');
             (function(idx) {
                 jQuery(deleteTag).click(function (e) {
-                    jQuery("#att-" + idx).hide('slow', function() {
+                    jQuery("#att-detail-" + idx).hide('slow', function() {
                         this.remove();
                         var newlist = [];
                         for (i = 0; i < idlist.length; i++) {
@@ -305,6 +305,7 @@ jQuery(function($) {
         var detailView = jQuery("#ewg-detail-view");
         detailView.off('click');
         detailView.on('click', function(e) {
+            idlist = updateIdList("thumbnail");
             refreshPanel(object, idlist, dt, "detail");
             configurePanel(idlist, dt);
             showPanel("detail");
@@ -321,14 +322,23 @@ jQuery(function($) {
         object.window.open();
     }
 
-    var submitHandler = function (dt, object) {
+    var updateIdList = function (panelType) {
 
         var idlist = [];
-        divlist = jQuery("#ewg-detail-panel").children("div[id]");
+        var panelId = "#ewg-" + panelType + "-panel";
+        var attIdPfx = "att-" + panelType + "-";
+        divlist = jQuery(panelId).children("div[id]");
         for (i = 0; i < divlist.length; i++) {
-            var newId = divlist[i].id.replace("att-", "");
+            var newId = divlist[i].id.replace(attIdPfx, "");
             idlist.push(newId);
         }
+
+        return idlist;
+    }
+
+    var submitHandler = function (dt, object) {
+
+        var idlist = updateIdList("detail");
 
         var mdata = [];
         for (i = 0; i < idlist.length; i++) {
