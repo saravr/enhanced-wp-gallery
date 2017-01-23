@@ -150,7 +150,12 @@ jQuery(function($) {
             attObj.fetch();
             var aaa = JSON.stringify(attObj); // TBD !!!
             var att = JSON.parse(aaa);
-            var url = att.sizes.thumbnail.url;
+            var url = "";
+            if (att.sizes.thumbnail !== undefined) {
+                url = att.sizes.thumbnail.url;
+            } else if (att.sizes.full !== undefined) {
+                url = att.sizes.full.url;
+            }
 
             if (panelType === "detail") {
                 var titlePfx = 'ewg-title-' + dt;
