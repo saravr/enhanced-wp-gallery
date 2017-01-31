@@ -128,7 +128,7 @@ jQuery(function($) {
         var pId = "ewg-" + panelType + "-panel";
         var p;
         if (!refresh) {
-            jQuery("#" + pId).remove();
+            //jQuery("#" + pId).remove();
             var style = 'style="overflow-y:scroll;height:540px;"';
             if (panelType === "thumbnail") {
                 style = 'style="overflow-y:scroll;height:540px;overflow-x:hidden;max-width:100%;"';
@@ -301,14 +301,14 @@ jQuery(function($) {
         var tileView = jQuery("#ewg-tile-view");
         tileView.off('click');
         tileView.on('click', function(e) {
-            //refreshPanel(object, idlist, dt, "thumbnail");
+            refreshPanel(object, idlist, dt, "thumbnail");
             showPanel("thumbnail");
         });
 
         var detailView = jQuery("#ewg-detail-view");
         detailView.off('click');
         detailView.on('click', function(e) {
-            //refreshPanel(object, idlist, dt, "detail");
+            refreshPanel(object, idlist, dt, "detail");
             configurePanel(idlist, dt);
             showPanel("detail");
         });
