@@ -189,7 +189,8 @@ jQuery(function($) {
 
     var refreshPanel = function (object, idlist, dt, panelType) {
 
-        createPanel(object, idlist, dt, panelType, true);
+        //createPanel(object, idlist, dt, panelType, true); <-- THIS CAUSES PROBLEMS
+        createPanel(object, idlist, dt, panelType, false);
     }
 
     var configurePanel = function (idlist, dt) {
@@ -297,22 +298,21 @@ jQuery(function($) {
         showPanel("detail");
         //showPanel("thumbnail");
 
-/*
         var tileView = jQuery("#ewg-tile-view");
         tileView.off('click');
         tileView.on('click', function(e) {
-            refreshPanel(object, idlist, dt, "thumbnail");
+            //refreshPanel(object, idlist, dt, "thumbnail");
             showPanel("thumbnail");
         });
 
         var detailView = jQuery("#ewg-detail-view");
         detailView.off('click');
         detailView.on('click', function(e) {
-            refreshPanel(object, idlist, dt, "detail");
+            //refreshPanel(object, idlist, dt, "detail");
             configurePanel(idlist, dt);
             showPanel("detail");
         });
-*/
+
         configurePanel(idlist, dt);
 
         console.log('Setting back handler with idlist: ' + idlist);
