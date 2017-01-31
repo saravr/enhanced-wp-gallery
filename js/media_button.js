@@ -157,7 +157,7 @@ jQuery(function($) {
                 var captionPfx = 'ewg-caption-' + dt;
                 var togglePfx = 'ewg-toggle-' + dt;
 
-                var ida = '<div class="ewg-att" id="att-' + id + '" style="padding-bottom:20px;margin-left:40px;height:400px;resize:vertical;">';
+                var ida = '<div class="ewg-att" id="att-detail-' + id + '" style="padding-bottom:20px;margin-left:40px;height:400px;resize:vertical;">';
 
                 var titleId = titlePfx + '-' + id;
                 var captionId = captionPfx + '-' + id;
@@ -174,8 +174,8 @@ jQuery(function($) {
                 ida += "</div>";
                 p.append(ida);
             } else {
-                var tnImg = '<div id="att-tn-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;"><img style="height:150px;width:auto;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
-                //var tnImg = '<div id="att-tn-' + id + '" class="attachment-preview thumbnail centered" style="width:150px;height:150px;display:inline-block;margin:10px;background:url("' + url + '");"></div>';
+                var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;"><img style="height:150px;width:auto;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
+                //var tnImg = '<div id="att-thumbnail-' + id + '" class="attachment-preview thumbnail centered" style="width:150px;height:150px;display:inline-block;margin:10px;background:url("' + url + '");"></div>';
                 p.append(tnImg);
             }
         }
@@ -222,7 +222,8 @@ jQuery(function($) {
             jQuery(deleteTag).off('click');
             (function(idx) {
                 jQuery(deleteTag).click(function (e) {
-                    jQuery("#att-" + idx).hide('slow', function() {
+                    var mode = getActivePanel();
+                    jQuery("#att-" + mode + "-" + idx).hide('slow', function() {
                         this.remove();
                         var newlist = [];
                         for (i = 0; i < idlist.length; i++) {
@@ -294,7 +295,9 @@ jQuery(function($) {
 
         jQuery(".media-modal-content").replaceWith(outerPanel);
         showPanel("detail");
+        //showPanel("thumbnail");
 
+/*
         var tileView = jQuery("#ewg-tile-view");
         tileView.off('click');
         tileView.on('click', function(e) {
@@ -309,6 +312,7 @@ jQuery(function($) {
             configurePanel(idlist, dt);
             showPanel("detail");
         });
+*/
         configurePanel(idlist, dt);
 
         console.log('Setting back handler with idlist: ' + idlist);
@@ -321,12 +325,24 @@ jQuery(function($) {
         object.window.open();
     }
 
+    var getActivePanel = function () {
+
+        if (jQuery("#ewg-thumbnail-panel").is(":visible")) {
+            return "thumbnail";
+        } else if (jQuery("#ewg-detail-panel").is(":visible")) {
+            return "detail";
+        }
+
+        return "";
+    }
+
     var submitHandler = function (dt, object) {
 
+        var mode = getActivePanel();
         var idlist = [];
-        divlist = jQuery("#ewg-detail-panel").children("div[id]");
+        divlist = jQuery("#ewg-" + mode + "-panel").children("div[id]");
         for (i = 0; i < divlist.length; i++) {
-            var newId = divlist[i].id.replace("att-", "");
+            var newId = divlist[i].id.replace("att-" + mode + "-", "");
             idlist.push(newId);
         }
 
