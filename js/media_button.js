@@ -3,6 +3,7 @@ jQuery(function($) {
     var url = ewg_data.ajax_url;
     var plugins_url = ewg_data.plugins_url;
     var shortcode = 'egallery'; // TBD replace shortcodes below
+    var capArray = {};
 
     $(document).ready(function(e){
 
@@ -130,10 +131,14 @@ jQuery(function($) {
         var p;
         if (!refresh) {
             if (panelType === "thumbnail") {
+                var captionPfx = 'ewg-caption-' + dt;
                 for (i = 0; i < idlist.length; i++) {
-                     var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
-                    var captionPfx = 'ewg-caption-' + dt;
-                    var captionId = '#' + captionPfx + '-' + id;
+                    var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
+                    var captId = captionPfx + '-' + id;
+                    var captionId = '#' + captId;
+
+                    var captionObj = tinyMCE.get(captId);
+                    capArray[captId] = (captionObj != null) ? captionObj.getContent() : "";
                     tinymce.remove(captionId);
                 }
             }
@@ -200,7 +205,6 @@ jQuery(function($) {
 
         var oldMode = (panelType === "thumbnail") ? "detail" : "thumbnail";
         idlist = getIdList(oldMode);
-console.log('OLDMODE: ' + oldMode + ', idlist: ' + idlist);
         //createPanel(object, idlist, dt, panelType, true); <-- THIS CAUSES PROBLEMS
         return createPanel(object, idlist, dt, panelType, false);
     }
@@ -208,6 +212,8 @@ console.log('OLDMODE: ' + oldMode + ', idlist: ' + idlist);
     var configurePanel = function (idlist, dt) {
 
         console.log('Configure panel');
+        console.log('ID length: ' + idlist.length);
+        console.log('IDs: ' + idlist);
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
             var captionPfx = 'ewg-caption-' + dt;
@@ -221,6 +227,13 @@ console.log('OLDMODE: ' + oldMode + ', idlist: ' + idlist);
                 plugins: "tabfocus,paste,media,fullscreen,wordpress,wpeditimage,wpgallery,wplink,wpdialogs",
                 toolbar: "bold italic | link unlink",
             });
+
+            if (captionId in capArray) {
+                tinyMCE.get(captionId).setContent(capArray[captionId]);
+console.log('DATA FOR ' + captionId + ' = ' + capArray[captionId]);
+            } else {
+console.log('NO DATA FOR ' + captionId);
+            }
 
             (function(tId, cId) {
                 jQuery("#" + tId).on('click', function(e) {
