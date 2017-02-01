@@ -129,6 +129,14 @@ jQuery(function($) {
         console.log('Create panel: ' + panelType);
         var p;
         if (!refresh) {
+            if (panelType === "thumbnail") {
+                for (i = 0; i < idlist.length; i++) {
+                     var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
+                    var captionPfx = 'ewg-caption-' + dt;
+                    var captionId = '#' + captionPfx + '-' + id;
+                    tinymce.remove(captionId);
+                }
+            }
             jQuery("#" + pId).remove();
             var style = 'style="overflow-y:scroll;height:540px;"';
             if (panelType === "thumbnail") {
@@ -153,7 +161,6 @@ jQuery(function($) {
             var att = JSON.parse(aaa);
             var url = (att.sizes.thumbnail !== undefined) ? att.sizes.thumbnail.url : att.sizes.full.url;
 
-console.log('ADDING ID: ' + id);
             if (panelType === "detail") {
                 var titlePfx = 'ewg-title-' + dt;
                 var captionPfx = 'ewg-caption-' + dt;
