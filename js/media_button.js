@@ -126,9 +126,10 @@ jQuery(function($) {
     var createPanel = function (object, idlist, dt, panelType, refresh = false) {
 
         var pId = "ewg-" + panelType + "-panel";
+        console.log('Create panel: ' + panelType);
         var p;
         if (!refresh) {
-            //jQuery("#" + pId).remove();
+            jQuery("#" + pId).remove();
             var style = 'style="overflow-y:scroll;height:540px;"';
             if (panelType === "thumbnail") {
                 style = 'style="overflow-y:scroll;height:540px;overflow-x:hidden;max-width:100%;"';
@@ -152,6 +153,7 @@ jQuery(function($) {
             var att = JSON.parse(aaa);
             var url = (att.sizes.thumbnail !== undefined) ? att.sizes.thumbnail.url : att.sizes.full.url;
 
+console.log('ADDING ID: ' + id);
             if (panelType === "detail") {
                 var titlePfx = 'ewg-title-' + dt;
                 var captionPfx = 'ewg-caption-' + dt;
@@ -189,12 +191,16 @@ jQuery(function($) {
 
     var refreshPanel = function (object, idlist, dt, panelType) {
 
+        var oldMode = (panelType === "thumbnail") ? "detail" : "thumbnail";
+        idlist = getIdList(oldMode);
+console.log('OLDMODE: ' + oldMode + ', idlist: ' + idlist);
         //createPanel(object, idlist, dt, panelType, true); <-- THIS CAUSES PROBLEMS
-        createPanel(object, idlist, dt, panelType, false);
+        return createPanel(object, idlist, dt, panelType, false);
     }
 
     var configurePanel = function (idlist, dt) {
 
+        console.log('Configure panel');
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
             var captionPfx = 'ewg-caption-' + dt;
@@ -301,14 +307,20 @@ jQuery(function($) {
         var tileView = jQuery("#ewg-tile-view");
         tileView.off('click');
         tileView.on('click', function(e) {
-            refreshPanel(object, idlist, dt, "thumbnail");
+            var newPanel = refreshPanel(object, idlist, dt, "thumbnail");
+        panel.append(newPanel);
             showPanel("thumbnail");
         });
 
         var detailView = jQuery("#ewg-detail-view");
         detailView.off('click');
         detailView.on('click', function(e) {
-            refreshPanel(object, idlist, dt, "detail");
+        var pId = "#ewg-detail-panel";
+//panel.remove(jQuery(pId));
+jQuery(pId).remove();
+            var newPanel = refreshPanel(object, idlist, dt, "detail");
+        panel.append(newPanel);
+console.log('ADD NEW PANEL ...');
             configurePanel(idlist, dt);
             showPanel("detail");
         });
@@ -334,6 +346,18 @@ jQuery(function($) {
         }
 
         return "";
+    }
+
+    var getIdList = function (mode) {
+
+        var idlist = [];
+        divlist = jQuery("#ewg-" + mode + "-panel").children("div[id]");
+        for (i = 0; i < divlist.length; i++) {
+            var newId = divlist[i].id.replace("att-" + mode + "-", "");
+            idlist.push(newId);
+        }
+
+        return idlist;
     }
 
     var submitHandler = function (dt, object) {
