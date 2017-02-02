@@ -3,7 +3,7 @@ jQuery(function($) {
     var url = ewg_data.ajax_url;
     var plugins_url = ewg_data.plugins_url;
     var shortcode = 'egallery'; // TBD replace shortcodes below
-    var capArray = {};
+    var mediaInfo = {};
 
     $(document).ready(function(e){
 
@@ -126,20 +126,23 @@ jQuery(function($) {
 
     var createPanel = function (object, idlist, dt, panelType, refresh = false) {
 
+        var titlePfx = 'ewg-title-' + dt;
+        var captionPfx = 'ewg-caption-' + dt;
+        var togglePfx = 'ewg-toggle-' + dt;
         var pId = "ewg-" + panelType + "-panel";
         console.log('Create panel: ' + panelType);
         var p;
         if (!refresh) {
             if (panelType === "thumbnail") {
-                var captionPfx = 'ewg-caption-' + dt;
                 for (i = 0; i < idlist.length; i++) {
                     var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
-                    var captId = captionPfx + '-' + id;
-                    var captionId = '#' + captId;
+                    var titleId = titlePfx + '-' + id;
+                    mediaInfo[titleId] = jQuery("#" + titleId).val();
 
+                    var captId = captionPfx + '-' + id;
                     var captionObj = tinyMCE.get(captId);
-                    capArray[captId] = (captionObj != null) ? captionObj.getContent() : "";
-                    tinymce.remove(captionId);
+                    mediaInfo[captId] = (captionObj != null) ? captionObj.getContent() : "";
+                    tinymce.remove("#" + captId);
                 }
             }
             jQuery("#" + pId).remove();
@@ -167,10 +170,6 @@ jQuery(function($) {
             var url = (att.sizes.thumbnail !== undefined) ? att.sizes.thumbnail.url : att.sizes.full.url;
 
             if (panelType === "detail") {
-                var titlePfx = 'ewg-title-' + dt;
-                var captionPfx = 'ewg-caption-' + dt;
-                var togglePfx = 'ewg-toggle-' + dt;
-
                 var ida = '<div class="ewg-att" id="att-detail-' + id + '" style="padding-bottom:20px;margin-left:40px;height:400px;resize:vertical;">';
 
                 var titleId = titlePfx + '-' + id;
@@ -216,9 +215,11 @@ jQuery(function($) {
         console.log('IDs: ' + idlist);
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
+            var titlePfx = 'ewg-title-' + dt;
             var captionPfx = 'ewg-caption-' + dt;
             var togglePfx = 'ewg-toggle-' + dt;
 
+            var titleId = titlePfx + '-' + id;
             var captionId = captionPfx + '-' + id;
             var toggleId = togglePfx + '-' + id;
             tinymce.init({
@@ -228,11 +229,12 @@ jQuery(function($) {
                 toolbar: "bold italic | link unlink",
             });
 
-            if (captionId in capArray) {
-                tinyMCE.get(captionId).setContent(capArray[captionId]);
-console.log('DATA FOR ' + captionId + ' = ' + capArray[captionId]);
-            } else {
-console.log('NO DATA FOR ' + captionId);
+            if (captionId in mediaInfo) {
+                tinyMCE.get(captionId).setContent(mediaInfo[captionId]);
+            }
+
+            if (titleId in mediaInfo) {
+                jQuery("#" + titleId).val(mediaInfo[titleId]);
             }
 
             (function(tId, cId) {
@@ -335,12 +337,11 @@ console.log('NO DATA FOR ' + captionId);
         var detailView = jQuery("#ewg-detail-view");
         detailView.off('click');
         detailView.on('click', function(e) {
-        var pId = "#ewg-detail-panel";
+            var pId = "#ewg-detail-panel";
 //panel.remove(jQuery(pId));
-jQuery(pId).remove();
+            jQuery(pId).remove();
             var newPanel = refreshPanel(object, idlist, dt, "detail");
-        panel.append(newPanel);
-console.log('ADD NEW PANEL ...');
+            panel.append(newPanel);
             configurePanel(idlist, dt);
             showPanel("detail");
         });
