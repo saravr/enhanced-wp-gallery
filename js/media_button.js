@@ -188,7 +188,6 @@ jQuery(function($) {
                 p.append(ida);
             } else {
                 var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;"><img style="height:150px;width:auto;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
-                //var tnImg = '<div id="att-thumbnail-' + id + '" class="attachment-preview thumbnail centered" style="width:150px;height:150px;display:inline-block;margin:10px;background:url("' + url + '");"></div>';
                 p.append(tnImg);
             }
         }
@@ -204,11 +203,10 @@ jQuery(function($) {
 
         var oldMode = (panelType === "thumbnail") ? "detail" : "thumbnail";
         idlist = getIdList(oldMode);
-        //createPanel(object, idlist, dt, panelType, true); <-- THIS CAUSES PROBLEMS
         return createPanel(object, idlist, dt, panelType, false);
     }
 
-    var configurePanel = function (idlist, dt) {
+    var configurePanel = function (idlist, dt, initial = false) {
 
         console.log('Configure panel');
         console.log('ID length: ' + idlist.length);
@@ -229,12 +227,14 @@ jQuery(function($) {
                 toolbar: "bold italic | link unlink",
             });
 
-            if (captionId in mediaInfo) {
-                tinyMCE.get(captionId).setContent(mediaInfo[captionId]);
-            }
+            if (!initial) {
+                if (captionId in mediaInfo) {
+                    tinyMCE.get(captionId).setContent(mediaInfo[captionId]);
+                }
 
-            if (titleId in mediaInfo) {
-                jQuery("#" + titleId).val(mediaInfo[titleId]);
+                if (titleId in mediaInfo) {
+                    jQuery("#" + titleId).val(mediaInfo[titleId]);
+                }
             }
 
             (function(tId, cId) {
@@ -330,7 +330,7 @@ jQuery(function($) {
         tileView.off('click');
         tileView.on('click', function(e) {
             var newPanel = refreshPanel(object, idlist, dt, "thumbnail");
-        panel.append(newPanel);
+            panel.append(newPanel);
             showPanel("thumbnail");
         });
 
@@ -338,7 +338,7 @@ jQuery(function($) {
         detailView.off('click');
         detailView.on('click', function(e) {
             var pId = "#ewg-detail-panel";
-//panel.remove(jQuery(pId));
+            //panel.remove(jQuery(pId));
             jQuery(pId).remove();
             var newPanel = refreshPanel(object, idlist, dt, "detail");
             panel.append(newPanel);
@@ -346,7 +346,7 @@ jQuery(function($) {
             showPanel("detail");
         });
 
-        configurePanel(idlist, dt);
+        configurePanel(idlist, dt, true);
 
         console.log('Setting back handler with idlist: ' + idlist);
         jQuery(backtag).off('click');
