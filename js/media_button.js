@@ -415,7 +415,7 @@ jQuery(function($) {
             var gallerySC = '[egallery ids="' + idlist + '"]';
             console.log('GALLERY SC: ' + gallerySC);
             if (object.galleryMode === "new") {
-                wp.media.editor.insert(gallerySC);
+                tinyMCE.get("content").setContent(gallerySC);
             } else {
                 var contents = tinyMCE.get("content").getContent();
                 console.log('Original contents: ' + contents);
