@@ -3,6 +3,11 @@
 
     tinymce.PluginManager.add(shortcode, function( editor, url ) {
 
+        var beforeSetHandler = function(event) {
+
+            event.content = replaceShortcodes(event.content);
+        };
+
         function updateGalleryItem (url, caption, gid, id) {
 
             console.log('Received media info for ID: ' + id);
@@ -11,7 +16,7 @@
             var captionId = gid + '-caption-' + id;
 
             var content = tinyMCE.get("content").getContent();
-            tinyMCE.get("content").setContent(content);
+            tinyMCE.get("content").setContent(content + "XXXX");
 
             jQuery("#" + imgId).attr('src', url);
             jQuery("#" + captionId).html(caption);
@@ -41,8 +46,10 @@
             return output;
         }
 
-        function addMedia (gid, ids) {
+        function addMedia (gid, ids, ind) {
 
+            console.log('Adding media to the gallery display ...');
+            console.log('ID LEN: ' + ids.length);
             var output = '';
             for (i = 0; i < ids.length; i++) {
                 var id = ids[i].trim();
@@ -50,7 +57,7 @@
                 var url = att.get('url');
                 output += getGalleryItem(url, att.get('caption'), gid, id);
 
-                // COMMENTED: to make sure updated captions show up
+                if (ind !== "</p>XXXX") {
                 //if (url === undefined) {
                     console.log('Media info not available yet for id: ' + id + ', req aysncly');
                     (function(attx, gidx, idx) {
@@ -61,12 +68,13 @@
                         att.fetch({success:cb});
                     })(att, gid, id);
                 //}
+                }
             }
 
             return output;
         }
 
-        function html (all, data) {
+        function html (all, data, ind) {
 
             var encodedData = window.encodeURIComponent(all);
 
@@ -78,7 +86,7 @@
             data = data.trim();
             data = data.replace(/['"]+/g, '');
             var ids = data.split(",");
-            output += addMedia(gid, ids);
+            output += addMedia(gid, ids, ind);
 
             output += '</div>';
             output += '<span class="wpview-end"></span>';
@@ -90,16 +98,17 @@
         function replaceShortcodes (content) {
 
             // TBD: dont hardcode shortcode below
-            return content.replace(/\[egallery ids=([^\]]*)\]/g,
-                function (all, attrs) {
-                    return html(all, attrs);
+            return content.replace(/\[egallery ids=([^\]]*)\](.*)/g,
+                function (all, attrs, ind) {
+all = all.replace(/XXXX$/, '');
+console.log('ALL: ' + all);
+console.log('attrs: ' + attrs);
+console.log('ind: ' + ind);
+                    return html(all, attrs, ind);
                 }
             );
         }
 
-        editor.on('BeforeSetcontent', function(event) {
-
-            event.content = replaceShortcodes(event.content);
-        });
+        editor.on('BeforeSetcontent', beforeSetHandler);
     })
 })();
