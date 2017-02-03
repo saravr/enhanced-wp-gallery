@@ -85,11 +85,19 @@ class EnhancedWPGallery {
             $att_post = get_post($attid); 
             $post_title = $att_post->post_title;
             $excerpt = $att_post->post_excerpt;
-            if (strcmp($title, $post_title) !== 0 ||
-                strcmp($caption, $excerpt) !== 0) {
-                $newid = $this->clone_attachment($attid, $title, $caption);
+            $parent_id = wp_get_post_parent_id($attid);
+            $own_att = ($parent_id == $postid);
+            if (!$own_att && (strcmp($title, $post_title) !== 0 ||
+                strcmp($caption, $excerpt) !== 0)) {
+                $newid = $this->clone_attachment($attid, $title, $caption, $postid);
                 array_push($atts, $newid);
             } else {
+                $upd_post = array(
+                    'ID'           => $attid,
+                    'post_title'   => $title,
+                    'post_excerpt' => $caption,
+                );
+                wp_update_post($upd_post);
                 array_push($atts, $attid);
             }
         }
@@ -100,13 +108,13 @@ class EnhancedWPGallery {
         wp_die();
     }
 
-    private function clone_attachment ($parent_id, $title, $caption) {
+    private function clone_attachment ($src_id, $title, $caption, $parent_id) {
         global $wpdb;
 
         $caption = stripslashes($caption);
         $clone_id = '';
         $table_name = $wpdb->prefix . "posts";
-        $sql = 'SELECT * FROM ' . $table_name . ' WHERE id = ' . $parent_id;
+        $sql = 'SELECT * FROM ' . $table_name . ' WHERE id = ' . $src_id;
         $results = $wpdb->get_results($sql, OBJECT);
         foreach ($results as $result) {
             $res = $wpdb->insert(
@@ -140,8 +148,8 @@ class EnhancedWPGallery {
 
                 $attrs = array("_wp_attached_file", "amazonS3_info", "_wp_attachment_metadata");
                 foreach ($attrs as $attr) {
-                    if (!$this->clone_meta($parent_id, $clone_id, $attr)) {
-                        error_log("Failed to clone key: " . $attr . " (" . $parent_id . ")");
+                    if (!$this->clone_meta($src_id, $clone_id, $attr)) {
+                        error_log("Failed to clone key: " . $attr . " (" . $src_id . ")");
                     }
                 }
             }
@@ -151,9 +159,9 @@ class EnhancedWPGallery {
         return $clone_id;
     }
 
-    private function clone_meta ($parent_id, $clone_id, $key) {
+    private function clone_meta ($src_id, $clone_id, $key) {
 
-        $value = get_post_meta($parent_id, $key, true);
+        $value = get_post_meta($src_id, $key, true);
         return add_post_meta($clone_id, $key, $value);
     }
 

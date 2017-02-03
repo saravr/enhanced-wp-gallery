@@ -50,7 +50,8 @@
                 var url = att.get('url');
                 output += getGalleryItem(url, att.get('caption'), gid, id);
 
-                if (url === undefined) {
+                // COMMENTED: to make sure updated captions show up
+                //if (url === undefined) {
                     console.log('Media info not available yet for id: ' + id + ', req aysncly');
                     (function(attx, gidx, idx) {
                         var cb = function(att) {
@@ -59,7 +60,7 @@
                         };
                         att.fetch({success:cb});
                     })(att, gid, id);
-                }
+                //}
             }
 
             return output;
