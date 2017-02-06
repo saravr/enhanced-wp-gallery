@@ -65,21 +65,27 @@ jQuery(function($) {
 
     var open_media_window = function (e) {
 
-        console.log('OPEN MEDIA WINDOW ...');
+        console.log('OPEN MEDIA WINDOW ...' + e.data.mode);
 
         var idlist = [];
 
+        var contents = tinyMCE.get("content").getContent();
+        console.log('Gallery contents: ' + contents);
+        var content = extractGallery(contents);
+        this.galleryContents = content;
+        var regex = /\[egallery ids=([^\]]*)\]/;
+        var matches = regex.exec(content);
+
         this.galleryMode = e.data.mode;
         if (this.galleryMode === "edit") {
-            var contents = tinyMCE.get("content").getContent();
-            console.log('EDIT: Original contents: ' + contents);
-            var content = extractGallery(contents);
-            this.galleryContents = content;
-            var regex = /\[egallery ids=([^\]]*)\]/;
-            var matches = regex.exec(content);
             if (matches !== null && matches.length > 1) {
                 var data = matches[1].replace(/['"]+/g, '');
                 idlist = data.split(",");
+            }
+        } else { // new ...
+            if (matches !== null && matches.length > 1) {
+                alert("Gallery exists already, please edit");
+                return false;
             }
         }
 
@@ -111,10 +117,22 @@ jQuery(function($) {
         console.log("Showing panel: " + p);
         if (p === "thumbnail") {
             jQuery("#ewg-detail-panel").hide();
+            //jQuery("#ewg-detail-view").prop("disabled", false);
+            //jQuery("#ewg-detail-view").css('text-decoration', 'underline');
+            jQuery("#ewg-detail-view").show();
             jQuery("#ewg-thumbnail-panel").show();
+            //jQuery("#ewg-thumbnail-view").prop("disabled", true);
+            //jQuery("#ewg-thumbnail-view").css('text-decoration', 'none');
+            jQuery("#ewg-thumbnail-view").hide();
         } else {
             jQuery("#ewg-thumbnail-panel").hide();
+            //jQuery("#ewg-thumbnail-view").prop("disabled", false);
+            //jQuery("#ewg-thumbnail-view").css('text-decoration', 'underline');
+            jQuery("#ewg-thumbnail-view").show();
             jQuery("#ewg-detail-panel").show();
+            //jQuery("#ewg-detail-view").prop("disabled", true);
+            //jQuery("#ewg-detail-view").css('text-decoration', 'none');
+            jQuery("#ewg-detail-view").hide();
         }
     }
 
@@ -187,7 +205,7 @@ jQuery(function($) {
                 ida += "</div>";
                 p.append(ida);
             } else {
-                var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;"><img style="height:150px;width:auto;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
+                var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;border:solid 5px lightblue;border-radius:5px;"><img style="height:150px;width:150px;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
                 p.append(tnImg);
             }
         }
@@ -296,13 +314,13 @@ jQuery(function($) {
         var outerPanel = jQuery('<div id="ewg-outer-panel" style="overflow-y:hidden;height:660px;background:white;"></div>');
         var headingHtml = `
 <div style="height:40px;padding-left:20px;width:100%;">
-  <div style="display:table-cell;width:89%;">
+  <div style="display:table-cell;width:40%;">
     <h1>Edit Gallery</h1>
   </div>
-  <div style="display:table-cell;width:20%;">
-    <a href="#" id="ewg-tile-view">Tile View</a>
+  <div style="display:table-cell;width:60%;padding-left:30px;">
+    <a href="#" id="ewg-thumbnail-view" style="font-size:10pt;">Switch to Tile View</a>
     &nbsp;
-    <a href="#" id="ewg-detail-view">Details View</a>
+    <a href="#" id="ewg-detail-view" style="font-size:10pt;">Switch to Details View</a>
   </div>
 </div>'
 `;
@@ -326,9 +344,9 @@ jQuery(function($) {
         showPanel("detail");
         //showPanel("thumbnail");
 
-        var tileView = jQuery("#ewg-tile-view");
-        tileView.off('click');
-        tileView.on('click', function(e) {
+        var thumbnailView = jQuery("#ewg-thumbnail-view");
+        thumbnailView.off('click');
+        thumbnailView.on('click', function(e) {
             var newPanel = refreshPanel(object, idlist, dt, "thumbnail");
             panel.append(newPanel);
             showPanel("thumbnail");
