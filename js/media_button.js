@@ -117,23 +117,17 @@ jQuery(function($) {
         console.log("Showing panel: " + p);
         if (p === "thumbnail") {
             jQuery("#ewg-detail-panel").hide();
-            //jQuery("#ewg-detail-view").prop("disabled", false);
-            //jQuery("#ewg-detail-view").css('text-decoration', 'underline');
             jQuery("#ewg-detail-view").show();
             jQuery("#ewg-thumbnail-panel").show();
-            //jQuery("#ewg-thumbnail-view").prop("disabled", true);
-            //jQuery("#ewg-thumbnail-view").css('text-decoration', 'none');
             jQuery("#ewg-thumbnail-view").hide();
         } else {
             jQuery("#ewg-thumbnail-panel").hide();
-            //jQuery("#ewg-thumbnail-view").prop("disabled", false);
-            //jQuery("#ewg-thumbnail-view").css('text-decoration', 'underline');
             jQuery("#ewg-thumbnail-view").show();
             jQuery("#ewg-detail-panel").show();
-            //jQuery("#ewg-detail-view").prop("disabled", true);
-            //jQuery("#ewg-detail-view").css('text-decoration', 'none');
             jQuery("#ewg-detail-view").hide();
         }
+        console.log('T ACT?: ' + jQuery("#ewg-thumbnail-panel").is(":visible"));
+        console.log('D ACT?: ' + jQuery("#ewg-detail-panel").is(":visible"));
     }
 
     var removePanel = function () {
@@ -433,10 +427,12 @@ jQuery(function($) {
             var gallerySC = '[egallery ids="' + idlist + '"]';
             console.log('GALLERY SC: ' + gallerySC);
             if (object.galleryMode === "new") {
-                tinyMCE.get("content").setContent(gallerySC);
+                var contents = tinyMCE.get("content").getContent();
+                console.log('New: Original contents: ' + contents);
+                tinyMCE.get("content").setContent(contents + "<p>" + gallerySC);
             } else {
                 var contents = tinyMCE.get("content").getContent();
-                console.log('Original contents: ' + contents);
+                console.log('Edit: Original contents: ' + contents);
                 var gallery = extractGallery(contents);
                 console.log('Replacing: ' + gallery + ' with ' + gallerySC);
                 contents = contents.replace(gallery, gallerySC);

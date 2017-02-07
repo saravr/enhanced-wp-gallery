@@ -28,11 +28,13 @@ class EnhancedWPGallery {
 
         add_filter('mce_external_plugins', array($this ,'ewg_mce_external_plugins'));
         add_filter('mce_buttons', array($this, 'ewg_mce_buttons'));
+        add_filter('media_view_strings', array($this, 'filter_media_strings'));
+        //add_action('admin_head', array($this, 'remove_add_media'));
 
         add_shortcode(self::$shortcode, array($this, 'replace_egallery_shortcode'));
     }
 
-    function ewg_mce_external_plugins($plugin_array) {
+    function ewg_mce_external_plugins ($plugin_array) {
 
         $plugin_array[self::$shortcode] = plugins_url('js/mce-button.js', __FILE__);
         return $plugin_array;
@@ -106,6 +108,27 @@ class EnhancedWPGallery {
         echo "{\"status\": \"ok\", \"idlist\": \"" . $newids . "\"}";
 
         wp_die();
+    }
+
+    function remove_add_media () {
+
+        $content_post = get_post();
+        $content = $content_post->post_content;
+        if (stripos($content, '[' . self::$shortcode) !== false) {
+            remove_action('media_buttons', 'media_buttons');
+        }
+    }
+
+    function filter_media_strings ($strings) {
+
+        //if(!current_user_can('edit_posts')){
+error_log('BEFORE: ' . count($strings));
+            unset($strings["createGalleryTitle"]);
+            unset($strings["createVideoPlaylistTitle"]);
+error_log('AFT: ' . count($strings));
+        //}
+
+        return $strings;
     }
 
     private function clone_attachment ($src_id, $title, $caption, $parent_id) {
