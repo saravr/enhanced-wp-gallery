@@ -7,11 +7,13 @@ jQuery(function($) {
 
     $(document).ready(function(e){
 
+console.log('ONE .....');
         if (ewg_data.legacy_ss == "yes") {
             console.log('Post has legacy slideshow, ignore');
             return;
         }
 
+console.log('TWO .....');
         //preventing loss of focus
         $(document).on('focusin', function(e) {
             if ($(e.target).closest(".mce-window").length) {
@@ -25,6 +27,7 @@ jQuery(function($) {
 
         jQuery(document).off('click', '.dashicons-no');
         jQuery(document).on('click', '.dashicons-no', delete_gallery);
+console.log('THREE .....');
     });
 
     var extractGallery = function (contents) {
@@ -199,7 +202,8 @@ jQuery(function($) {
                 ida += "</div>";
                 p.append(ida);
             } else {
-                var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;border:solid 5px lightblue;border-radius:5px;"><img style="height:150px;width:150px;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
+                //var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;border:solid 5px lightblue;border-radius:5px;"><img style="height:150px;width:150px;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
+                var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;border:solid 5px lightblue;border-radius:5px;"><img class="center-cropped ewg-tn-image" src="' + url + '"/></div>';
                 p.append(tnImg);
             }
         }

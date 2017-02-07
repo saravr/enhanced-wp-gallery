@@ -1,4 +1,18 @@
+.center-cropped {
+  object-fit: none; /* Do not scale the image */
+  object-position: center; /* Center the image within the element */
+  height: 150px;
+  width: 150px;
+}
+
 .ewg-image {
+  object-fit: none; /* Do not scale the image */
+  object-position: center; /* Center the image within the element */
+  height: 320px;
+  width: 320px;
+}
+
+.SAVE-ewg-image {
     display: block;
     max-width: 320px;
     max-height: 320px;
@@ -34,6 +48,6 @@
     object-fit: contain;
 }
 
-#wp-link-wrap, div.mce-inline-toolbar-grp{
-    z-index: 1600001!important;
+#wp-link-wrap, .mce-toolbar-grp.mce-inline-toolbar-grp.mce-container.mce-panel.mce-arrow-up.mce-arrow-left, #ewg-outer-panel, .mce-tooltip {
+    z-index: 1600000!important;
 }
