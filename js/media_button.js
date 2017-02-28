@@ -191,6 +191,7 @@ jQuery(function($) {
         console.log('Create panel: ' + panelType);
         var p;
         if (!refresh) {
+            console.log("not refresh!!!");
             if (panelType === "thumbnail") {
                 for (i = 0; i < idlist.length; i++) {
                     var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
@@ -255,7 +256,17 @@ jQuery(function($) {
                 ida += "</div>";
                 p.append(ida);
             } else {
-                var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;border:solid 5px lightblue;border-radius:5px;"><img class="center-cropped ewg-tn-image" src="' + url + '"/></div>';
+                var tnImg = '<div id="att-thumbnail-' + id + '" style="width: 157px;" tabindex="0" role="checkbox" aria-label="Cvetok_3" aria-checked="false" data-id="911" class="attachment save-ready">'+
+                    '<div class="attachment-preview js--select-attachment type-image subtype-jpeg landscape">'+
+                    '<div class="thumbnail">'+
+
+                    '<div class="centered">'+
+                '<img class="" src="' + url + '" draggable="false" alt="">'+
+                '</div>'+
+                '</div>'+
+                '<button type="button" class="button-link attachment-close media-modal-icon" onclick="removeThisBlock(this)"><span class="screen-reader-text">Remove</span></button>'+
+                '</div>'+
+                '</div>';
                 p.append(tnImg);
             }
         }
@@ -266,6 +277,8 @@ jQuery(function($) {
 
         return p;
     }
+
+
 
     var refreshPanel = function (object, idlist, dt, panelType) {
 
@@ -574,3 +587,10 @@ jQuery(function($) {
         object.window.on('open', callback);
     }
 });
+
+
+function removeThisBlock(element) {
+    jQuery(element).parents( ".attachment" ).remove();
+}
+
+
