@@ -7,13 +7,11 @@ jQuery(function($) {
 
     $(document).ready(function(e){
 
-console.log('ONE .....');
         if (ewg_data.legacy_ss == "yes") {
             console.log('Post has legacy slideshow, ignore');
             return;
         }
 
-console.log('TWO .....');
         //preventing loss of focus
         $(document).on('focusin', function(e) {
             if ($(e.target).closest(".mce-window").length) {
@@ -27,7 +25,6 @@ console.log('TWO .....');
 
         jQuery(document).off('click', '.dashicons-no');
         jQuery(document).on('click', '.dashicons-no', delete_gallery);
-console.log('THREE .....');
     });
 
     var extractGallery = function (contents) {
@@ -107,7 +104,7 @@ console.log('THREE .....');
             selectHandler(self, idlist);
         } else {
             showSavedSelection(idlist, this);
-            console.log('Setting select handler ...');
+            console.log('Setting select handler! ...');
             this.window.on('select', function(arg) { selectHandler(self); });
             this.window.open();
         }
@@ -129,8 +126,6 @@ console.log('THREE .....');
             jQuery("#ewg-detail-panel").show();
             jQuery("#ewg-detail-view").hide();
         }
-        console.log('T ACT?: ' + jQuery("#ewg-thumbnail-panel").is(":visible"));
-        console.log('D ACT?: ' + jQuery("#ewg-detail-panel").is(":visible"));
     }
 
     var removePanel = function () {
@@ -202,7 +197,6 @@ console.log('THREE .....');
                 ida += "</div>";
                 p.append(ida);
             } else {
-                //var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;border:solid 5px lightblue;border-radius:5px;"><img style="height:150px;width:150px;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
                 var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;border:solid 5px lightblue;border-radius:5px;"><img class="center-cropped ewg-tn-image" src="' + url + '"/></div>';
                 p.append(tnImg);
             }
@@ -436,7 +430,7 @@ console.log('THREE .....');
                 tinyMCE.get("content").setContent(contents + "<p>" + gallerySC);
             } else {
                 var contents = tinyMCE.get("content").getContent();
-                console.log('Edit: Original contents: ' + contents);
+                console.log('Original contents: ' + contents);
                 var gallery = extractGallery(contents);
                 console.log('Replacing: ' + gallery + ' with ' + gallerySC);
                 contents = contents.replace(gallery, gallerySC);

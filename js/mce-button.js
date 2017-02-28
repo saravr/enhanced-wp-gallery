@@ -97,7 +97,6 @@
 
         function replaceShortcodes (content) {
 
-console.log('*********** CONTENT: ' + content);
             // TBD: dont hardcode shortcode below
             return content.replace(/\[egallery ids=([^\]]*)\](.*)/g,
                 function (all, attrs, ind) {
