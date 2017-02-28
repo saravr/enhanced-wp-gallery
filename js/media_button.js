@@ -18,13 +18,15 @@ jQuery(function($) {
                 e.stopImmediatePropagation();
             }
         });
+
         $('#insert-my-media').click({mode: 'new'}, open_media_window);
 
-        jQuery(document).off('click', '.dashicons-edit');
-        jQuery(document).on('click', '.dashicons-edit', {mode: 'edit'}, open_media_window);
-
-        jQuery(document).off('click', '.dashicons-no');
-        jQuery(document).on('click', '.dashicons-no', delete_gallery);
+        //jQuery(document).off('click', '.mce-first > button > .dashicons-edit');
+        //jQuery(document).on('click', '.mce-first > button > .dashicons-edit', {mode: 'edit'}, open_media_window);
+        //jQuery(document).off('click', '.dashicons-no');
+        //jQuery(document).on('click', '.dashicons-no', delete_gallery);
+        jQuery(document).on('click', '.dashicons-no-galery', delete_gallery);
+        jQuery(document).on('click', '.yourClass', {mode: 'edit'}, open_media_window);
     });
 
     var extractGallery = function (contents) {
@@ -57,19 +59,56 @@ jQuery(function($) {
         };
 
         jQuery.post(url, sel_msg, function(response) {
-            console.log('Sent selection - response: ' + response);
+            console.log('Sent gallery selection - response: ' + response);
             var resp = JSON.parse(response);
             callback(resp.idlist, object);
         });
     }
 
+    function getEditorContents (mceId, textId) {
+
+        var contents = "";
+        if (mceId == "content") { // main editor
+            if (tinyMCE.get(mceId)) {
+                contents = tinyMCE.get(mceId).getContent();
+            } else {
+                contents = jQuery(textId).val();
+            }
+        } else {
+            if (tinyMCE.get(mceId) && !tinyMCE.get(mceId).isHidden()) {
+                contents = tinyMCE.get(mceId).getContent();
+            } else {
+                contents = jQuery(textId).val();
+            }
+        }
+
+        return contents;
+    }
+
+    function setEditorContents (content, mceId, textId) {
+
+        if (mceId == "content") { // main editor
+            if (tinyMCE.get(mceId)) {
+                tinyMCE.get(mceId).setContent(content);
+            } else {
+                jQuery(textId).val(content);
+            }
+        } else {
+            if (tinyMCE.get(mceId) && !tinyMCE.get(mceId).isHidden()) {
+                tinyMCE.get(mceId).setContent(content);
+            }
+            jQuery(textId).val(content);
+        }
+    }
+
     var open_media_window = function (e) {
 
         console.log('OPEN MEDIA WINDOW ...' + e.data.mode);
+        jQuery(".supports-drag-drop").remove(); // to avoid conflict with "Add Media"
 
-        var idlist = [];
+        this.idlist = [];
 
-        var contents = tinyMCE.get("content").getContent();
+        var contents = getEditorContents("content", ".wp-editor-area");
         console.log('Gallery contents: ' + contents);
         var content = extractGallery(contents);
         this.galleryContents = content;
@@ -80,7 +119,7 @@ jQuery(function($) {
         if (this.galleryMode === "edit") {
             if (matches !== null && matches.length > 1) {
                 var data = matches[1].replace(/['"]+/g, '');
-                idlist = data.split(",");
+                this.idlist = data.split(",");
             }
         } else { // new ...
             if (matches !== null && matches.length > 1) {
@@ -99,11 +138,12 @@ jQuery(function($) {
         var self = this;
 
         if (this.galleryMode === "edit") {
-            console.log('Showing select window ...');
+            console.log('Showing select window ... ' + self.idlist);
             this.window.open();
-            selectHandler(self, idlist);
+            startSpinner();
+            selectHandler(self, self.idlist);
         } else {
-            showSavedSelection(idlist, this);
+            showSavedSelection(self.idlist, this);
             console.log('Setting select handler ...');
             this.window.on('select', function(arg) { selectHandler(self); });
             this.window.open();
@@ -112,26 +152,26 @@ jQuery(function($) {
         return false;
     }
 
+    function startSpinner() {
+        //jQuery(".spinner").show();
+    }
+
+    function stopSpinner() {
+        //jQuery(".spinner").hide();
+    }
+
     var showPanel = function (p) {
 
         console.log("Showing panel: " + p);
         if (p === "thumbnail") {
             jQuery("#ewg-detail-panel").hide();
-            //jQuery("#ewg-detail-view").prop("disabled", false);
-            //jQuery("#ewg-detail-view").css('text-decoration', 'underline');
             jQuery("#ewg-detail-view").show();
             jQuery("#ewg-thumbnail-panel").show();
-            //jQuery("#ewg-thumbnail-view").prop("disabled", true);
-            //jQuery("#ewg-thumbnail-view").css('text-decoration', 'none');
             jQuery("#ewg-thumbnail-view").hide();
         } else {
             jQuery("#ewg-thumbnail-panel").hide();
-            //jQuery("#ewg-thumbnail-view").prop("disabled", false);
-            //jQuery("#ewg-thumbnail-view").css('text-decoration', 'underline');
             jQuery("#ewg-thumbnail-view").show();
             jQuery("#ewg-detail-panel").show();
-            //jQuery("#ewg-detail-view").prop("disabled", true);
-            //jQuery("#ewg-detail-view").css('text-decoration', 'none');
             jQuery("#ewg-detail-view").hide();
         }
     }
@@ -158,15 +198,14 @@ jQuery(function($) {
                     mediaInfo[titleId] = jQuery("#" + titleId).val();
 
                     var captId = captionPfx + '-' + id;
-                    var captionObj = tinyMCE.get(captId);
-                    mediaInfo[captId] = (captionObj != null) ? captionObj.getContent() : "";
+                    mediaInfo[captId] = getEditorContents(captId, "#" + captId);
                     tinymce.remove("#" + captId);
                 }
             }
             jQuery("#" + pId).remove();
             var style = 'style="overflow-y:scroll;height:540px;"';
             if (panelType === "thumbnail") {
-                style = 'style="overflow-y:scroll;height:540px;overflow-x:hidden;max-width:100%;"';
+                style = 'style="display:none;overflow-y:scroll;height:540px;overflow-x:hidden;max-width:100%;"';
             }
             p = jQuery('<div id="' + pId + '" ' + style + '></div>');
             if (panelType === "thumbnail") {
@@ -183,9 +222,20 @@ jQuery(function($) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
             var attObj = wp.media.attachment(id);
             attObj.fetch();
-            var aaa = JSON.stringify(attObj); // TBD !!!
-            var att = JSON.parse(aaa);
-            var url = (att.sizes.thumbnail !== undefined) ? att.sizes.thumbnail.url : att.sizes.full.url;
+
+            var aaa = attObj.toJSON();
+            var sizes = aaa['sizes'];
+            var url = "";
+            if (sizes.hasOwnProperty('thumbnail')) {
+                thumbnail = sizes['thumbnail'];
+                url = thumbnail['url']
+            } else if (sizes.hasOwnProperty('full')) {
+                full = sizes['full'];
+                url = full['url']
+            }
+
+            var title = aaa['title'];
+            title = title.replace(/"/g, '&quot;');
 
             if (panelType === "detail") {
                 var ida = '<div class="ewg-att" id="att-detail-' + id + '" style="padding-bottom:20px;margin-left:40px;height:400px;resize:vertical;">';
@@ -198,14 +248,14 @@ jQuery(function($) {
                 var deleteTag = '#' + deleteId;
                 var delButton = "<div style='width:320px;height:40px;'><button class='button-primary button-small ewg-remove-button' style='float:right;margin-bottom:10px;' id='" + deleteId + "'>Remove</button></div>";
 
-                ida += '<div style="width:320px;margin-top:10px;margin-right:40px;margin-bottom:40px;float:right;">' + delButton + '<img style="float:right;" class="ewg-image" src="' + url + '"/></div>';
-                ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + att.title + "\"/></div>";
-                ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label>&nbsp;<a href='#' class='ewg-button' style='float:right;' id=" + toggleId + ">View Text</a></div><br/><div style='border:1px solid #ddd;'><textarea class='ewg-caption' id=" + captionId + " style='width:100%;' row=3>" + att.caption + "</textarea></div></div>";
+                ida += '<div style="width:320px;margin-top:10px;margin-right:40px;margin-bottom:40px;float:right;">' + delButton + '<img class="ewg-image" src="' + url + '"/></div>';
+                ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Title</b></label></div><br/><input id=" + titleId + " style='width:100%' type='text' value=\"" + title + "\"/></div>";
+                ida += "<div style='width:60%;margin-top:5px;'><div style='margin-top:20px;'><label style='clear:left;'><b>Caption</b></label>&nbsp;<a href='#' class='ewg-button' style='float:right;' id=" + toggleId + ">View Text</a></div><br/><div style='border:1px solid #ddd;'><textarea class='ewg-caption' id=" + captionId + " style='width:100%;height:150px;' row=5>" + aaa['caption'] + "</textarea></div></div>";
 
                 ida += "</div>";
                 p.append(ida);
             } else {
-                var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;border:solid 5px lightblue;border-radius:5px;"><img style="height:150px;width:150px;max-width:150px;" class="ewg-tn-image" src="' + url + '"/></div>';
+                var tnImg = '<div id="att-thumbnail-' + id + '" style="width:150px;height:150px;display:inline-block;margin:10px;border:solid 5px lightblue;border-radius:5px;"><img class="center-cropped ewg-tn-image" src="' + url + '"/></div>';
                 p.append(tnImg);
             }
         }
@@ -226,9 +276,7 @@ jQuery(function($) {
 
     var configurePanel = function (idlist, dt, initial = false) {
 
-        console.log('Configure panel');
-        console.log('ID length: ' + idlist.length);
-        console.log('IDs: ' + idlist);
+        console.log('Configure panel, idlist: ' + idlist);
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
             var titlePfx = 'ewg-title-' + dt;
@@ -243,11 +291,18 @@ jQuery(function($) {
                 menu: {},
                 plugins: "tabfocus,paste,media,fullscreen,wordpress,wpeditimage,wpgallery,wplink,wpdialogs",
                 toolbar: "bold italic | link unlink",
+                setup: function(ed) {
+                    ed.on('init', function() {
+                      this.getDoc().body.style.fontSize = '13px';
+                    });
+                }  
             });
 
             if (!initial) {
                 if (captionId in mediaInfo) {
-                    tinyMCE.get(captionId).setContent(mediaInfo[captionId]);
+                    setEditorContents(mediaInfo[captionId],
+                        captionId, captionId);
+                    //tinyMCE.get(captionId).setContent(mediaInfo[captionId]);
                 }
 
                 if (titleId in mediaInfo) {
@@ -294,16 +349,42 @@ jQuery(function($) {
 
         if (idlist === undefined) {
             var list = object.window.state().get('selection').toJSON();
-            idlist = [];
+            var newIdlist = [];
             for (i = 0; i < list.length; i++) {
                 var id = list[i].id;
-                idlist.push(id);
+                newIdlist.push(id);
             }
+
+            var oldarr = [];
+            for (i = 0; i < object.idlist.length; ++i) {
+                var item = (typeof object.idlist[i] === "string") ? object.idlist[i].trim() : object.idlist[i];
+                oldarr.push(item);
+            }
+
+            var newlist = [];
+            for (i = 0; i < newIdlist.length; ++i) {
+                var item = (typeof newIdlist[i] === "string") ? newIdlist[i].trim() : newIdlist[i];
+                var found = false;
+                for (j = 0; j < oldarr.length; ++j) {
+                    var old = (typeof oldarr[j] === "string") ? oldarr[j].trim() : oldarr[j];
+                    if (item == old) {
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    newlist.push(item);
+                }
+            }
+
+            object.idlist = idlist = (object.addTo == "end") ?
+                oldarr.concat(newlist) : newlist.concat(oldarr);
         }
 
         var dt = Date.now();
         var backid = 'ewg-back-' + dt;
         var backtag = '#' + backid;
+        var addToEndId = 'ewg-addtoend-' + dt;
+        var addToEndTag = '#' + addToEndId;
         var submitId = 'ewg-submit-' + dt;
         var submitTag = '#' + submitId;
 
@@ -314,13 +395,13 @@ jQuery(function($) {
         var outerPanel = jQuery('<div id="ewg-outer-panel" style="overflow-y:hidden;height:660px;background:white;"></div>');
         var headingHtml = `
 <div style="height:40px;padding-left:20px;width:100%;">
-  <div style="display:table-cell;width:40%;">
+  <div style="display:table-cell;width:50%;">
     <h1>Edit Gallery</h1>
   </div>
   <div style="display:table-cell;width:60%;padding-left:30px;">
     <a href="#" id="ewg-thumbnail-view" style="font-size:10pt;">Switch to Tile View</a>
     &nbsp;
-    <a href="#" id="ewg-detail-view" style="font-size:10pt;">Switch to Details View</a>
+    <a href="#" id="ewg-detail-view" style="font-size:10pt;display:none;">Switch to Details View</a>
   </div>
 </div>'
 `;
@@ -328,7 +409,7 @@ jQuery(function($) {
 
         var buttonTitle = (object.galleryMode === "edit") ? "Update Gallery" : "Insert Gallery";
 
-        var footer = jQuery("<div style='padding-top:10px;padding-right:20px;bottom:0px;height:60px;'><button class='button-primary button-large' style='margin-left:10px;float:right;' id='" + submitId + "'>" + buttonTitle + "</button><button id='" + backid + "' class='button-primary button-large' style='margin-left:10px;float:right;'>Add Images</button></div>");
+        var footer = jQuery("<div class='ewg-footer' style='padding-top:10px;padding-right:20px;bottom:0px;height:60px;'><button class='button-primary button-large' style='margin-left:10px;float:right;' id='" + submitId + "'>" + buttonTitle + "</button><button id='" + backid + "' class='button-primary button-large' style='margin-left:10px;float:right;'>Add to Start of Gallery</button><button id='" + addToEndId + "' class='button-primary button-large' style='margin-left:10px;float:right;'>Add to End of Gallery</button></div>");
 
         var tnPanel = createPanel(object, idlist, dt, "thumbnail");
         panel.append(tnPanel);
@@ -350,6 +431,8 @@ jQuery(function($) {
             var newPanel = refreshPanel(object, idlist, dt, "thumbnail");
             panel.append(newPanel);
             showPanel("thumbnail");
+            jQuery(submitTag).prop('disabled', true);
+            jQuery(".ewg-footer").hide();
         });
 
         var detailView = jQuery("#ewg-detail-view");
@@ -362,18 +445,24 @@ jQuery(function($) {
             panel.append(newPanel);
             configurePanel(idlist, dt);
             showPanel("detail");
+            jQuery(submitTag).prop('disabled', false);
+            jQuery(".ewg-footer").show();
         });
 
         configurePanel(idlist, dt, true);
 
         console.log('Setting back handler with idlist: ' + idlist);
         jQuery(backtag).off('click');
-        jQuery(backtag).click(function(e) { backHandler(idlist, object); });
+        jQuery(backtag).click({addTo: "start"}, function(e) { backHandler(idlist, object, e.data.addTo); });
+
+        jQuery(addToEndTag).off('click');
+        jQuery(addToEndTag).click({addTo: "end"}, function(e) { backHandler(idlist, object, e.data.addTo); });
 
         jQuery(submitTag).off('click');
         jQuery(submitTag).click(function(e) { submitHandler(dt, object); });
 
         object.window.open();
+        stopSpinner();
     }
 
     var getActivePanel = function () {
@@ -412,18 +501,13 @@ jQuery(function($) {
         var mdata = [];
         for (i = 0; i < idlist.length; i++) {
             var id = (typeof idlist[i] === "string") ? idlist[i].trim() : idlist[i];
-            console.log('SUBMIT ID: ' + id);
 
             var titleId = 'ewg-title-' + dt + '-' + id;
             var title = jQuery("#" + titleId).val();
-            console.log(dt + ": title: " + title);
             title = (title !== undefined) ? title : "";
 
             var captionId = 'ewg-caption-' + dt + '-' + id;
-            var captionObj = tinyMCE.get(captionId);
-            var caption = (captionObj != null) ? captionObj.getContent() : "";
-
-            console.log(dt + ": caption: " + caption);
+            var caption = getEditorContents(captionId, '#' + captionId);
 
             mdata.push({"att": id, "title": title, "caption": caption});
         }
@@ -432,16 +516,17 @@ jQuery(function($) {
 
             var gallerySC = '[egallery ids="' + idlist + '"]';
             console.log('GALLERY SC: ' + gallerySC);
+            var contents = getEditorContents("content", ".wp-editor-area");
             if (object.galleryMode === "new") {
-                tinyMCE.get("content").setContent(gallerySC);
+                console.log('New: Original contents: ' + contents);
+                setEditorContents(contents + "<p>" + gallerySC,
+                    "content", ".wp-editor-area");
             } else {
-                var contents = tinyMCE.get("content").getContent();
-                console.log('Original contents: ' + contents);
+                console.log('Edit: Original contents: ' + contents);
                 var gallery = extractGallery(contents);
                 console.log('Replacing: ' + gallery + ' with ' + gallerySC);
                 contents = contents.replace(gallery, gallerySC);
-                tinyMCE.get("content").setContent(contents);
-                console.log('Loaded edited gallery: ' + contents);
+                setEditorContents(contents, "content", ".wp-editor-area");
             }
         });
 
@@ -450,19 +535,17 @@ jQuery(function($) {
         return false;
     }
 
-    var backHandler = function (idlist, object) {
-
-        console.log('Back handler invoked with idlist: ' + idlist);
+    var backHandler = function (idlist, object, addTo) {
 
         object.window.close();
         object.window = wp.media({
                         title: 'Select images for gallery',
                         library: {type: 'image'},
                         multiple: 'add',
-                        button: {text: 'Create Gallery'}
+                        button: {text: 'Update Gallery'}
         });
 
-        console.log('Setting select handler ...');
+        object.addTo = addTo;
         object.window.on('select', function(arg) { selectHandler(object); });
         console.log('Saved for selection: ' + idlist);
         showSavedSelection(idlist, object);
@@ -472,7 +555,6 @@ jQuery(function($) {
 
     var showSavedSelection = function (idlist, object) {
 
-        console.log('Setting OPEN handler with idlist: ' + idlist);
         if (idlist === undefined) {
             return;
         }

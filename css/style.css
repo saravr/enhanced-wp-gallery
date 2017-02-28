@@ -1,4 +1,27 @@
+.center-cropped {
+  object-fit: none; /* Do not scale the image */
+  object-position: center; /* Center the image within the element */
+  height: 150px;
+  width: 150px;
+}
+
 .ewg-image {
+  object-position: center; /* Center the image within the element */
+  max-height: 320px;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+.OLD-ewg-image {
+  object-fit: none; /* Do not scale the image */
+  object-position: center; /* Center the image within the element */
+  height: 320px;
+  width: 320px;
+}
+
+.SAVE-ewg-image {
     display: block;
     max-width: 320px;
     max-height: 320px;
@@ -35,5 +58,13 @@
 }
 
 #wp-link-wrap, .mce-toolbar-grp.mce-inline-toolbar-grp.mce-container.mce-panel.mce-arrow-up.mce-arrow-left, #ewg-outer-panel, .mce-tooltip {
-	z-index: 1600000!important;
+    z-index: 1600000!important;
+}
+
+#wp-link-wrap, .mce-toolbar-grp.mce-inline-toolbar-grp.mce-container.mce-panel.mce-arrow-up.mce-arrow-right, #ewg-outer-panel, .mce-tooltip {
+    z-index: 1600000!important;
+}
+
+#wp-link-wrap, .mce-toolbar-grp.mce-inline-toolbar-grp.mce-container.mce-panel.mce-arrow-up, #ewg-outer-panel, .mce-tooltip {
+    z-index: 1600000!important;
 }

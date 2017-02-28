@@ -23,18 +23,21 @@ class EnhancedWPGallery {
     private function __construct() {
         
         add_action('wp_enqueue_media', array($this, 'include_media_button_js_file'));
-        add_action('media_buttons', array($this, 'add_my_media_button'));
+        add_action('media_buttons', array($this, 'add_my_media_button'), 1);
         add_action('wp_ajax_coll_info', array($this, 'coll_info_callback'));
 
         add_filter('mce_external_plugins', array($this ,'ewg_mce_external_plugins'));
         add_filter('mce_buttons', array($this, 'ewg_mce_buttons'));
+        add_filter('media_view_strings', array($this, 'filter_media_strings'));
+        //add_action('admin_head', array($this, 'remove_add_media'));
 
         add_shortcode(self::$shortcode, array($this, 'replace_egallery_shortcode'));
     }
 
-    function ewg_mce_external_plugins($plugin_array) {
+    function ewg_mce_external_plugins ($plugin_array) {
 
         $plugin_array[self::$shortcode] = plugins_url('js/mce-button.js', __FILE__);
+
         return $plugin_array;
     }
 
@@ -49,13 +52,14 @@ class EnhancedWPGallery {
     }
 
     function include_media_button_js_file () {
-        global $post;
+        global $post, $pagenow;
 
         $postid = isset($post->ID) ? $post->ID : 0;
+
         $legacy_ss = $this->has_legacy_gallery($postid);
 
         wp_enqueue_script('media_button', plugins_url('js/media_button.js', __FILE__),
-            array('jquery', 'jquery-ui-dialog'), '1.1', true);
+            array('jquery', 'jquery-ui-dialog'), '1.8', true);
         wp_localize_script('media_button', 'ewg_data',
             array(
                 'ajax_url' => admin_url('admin-ajax.php'),
@@ -63,10 +67,12 @@ class EnhancedWPGallery {
                 'post_id' => $postid,
                 'legacy_ss' => $legacy_ss
             ));
-        wp_enqueue_style('eg_style', plugins_url('css/style.css', __FILE__));
+        wp_enqueue_style('eg_style', plugins_url('css/style.css', __FILE__),
+            array(), '0.2');
     }
 
     function add_my_media_button () {
+
         echo '<a href="#" id="insert-my-media" class="button">Build Gallery</a>';
     }
 
@@ -81,6 +87,10 @@ class EnhancedWPGallery {
             $attid = $att['att'];
             $title = $att['title'];
             $caption = $att['caption'];
+
+            $caption = str_replace("<p>", "", $caption);
+            $caption = str_replace("</p>", "", $caption);
+            error_log('STRIPPED CAPTION: ' . $caption);
 
             $att_post = get_post($attid); 
             $post_title = $att_post->post_title;
@@ -106,6 +116,25 @@ class EnhancedWPGallery {
         echo "{\"status\": \"ok\", \"idlist\": \"" . $newids . "\"}";
 
         wp_die();
+    }
+
+    function remove_add_media () {
+
+        $content_post = get_post();
+        $content = $content_post->post_content;
+        if (stripos($content, '[' . self::$shortcode) !== false) {
+            remove_action('media_buttons', 'media_buttons');
+        }
+    }
+
+    function filter_media_strings ($strings) {
+
+        //if(!current_user_can('edit_posts')){
+            unset($strings["createGalleryTitle"]);
+            unset($strings["createVideoPlaylistTitle"]);
+        //}
+
+        return $strings;
     }
 
     private function clone_attachment ($src_id, $title, $caption, $parent_id) {
